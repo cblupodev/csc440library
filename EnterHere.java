@@ -31,7 +31,7 @@ class EnterHere {
 		try {
 
 			connection = DriverManager.getConnection(
-					"jdbc:oracle:thin:@orca.csc.ncsu.edu:1521/orcl", "pscarlso@orcl",
+					"jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01", "pscarlso",
 					"001063754");
 
 		} catch (SQLException e) {
