@@ -66,6 +66,6 @@ class EnterHere {
     
     public void run() {
     	connectDatabase("pscarlso", "001063754");
-    	
+    	createTables();
     }
 }
