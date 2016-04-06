@@ -10,7 +10,7 @@ class EnterHere {
 	private Connection con = null;
 	private DBInteraction db = null;
 	Scanner console = new Scanner(System.in);
-	private Integer currentID;
+	private String currentID;
 	
     public static void main(String[] args) {
         EnterHere enter = new EnterHere();
@@ -77,7 +77,7 @@ class EnterHere {
     		String username = console.next();
     		sop("enter password");
     		String password = console.next();
-    		int log = db.isUser(username, password);
+    		String = db.isUser(username, password);
     		if (log != -1) {
     			// login succesfull
     			currentID = log;
@@ -131,10 +131,9 @@ class EnterHere {
     }
     
     private void displayProfile() {
-    	db.printProfile();
+    	sop(db.printProfile(currentID));
     	sop("(1) Go back (2) update profile");
     	int resu = console.nextInt();
-    	sop("resu   "+resu);
     	if (resu == 1) {
     		displayHomepage();
     	} else if (resu == 2) {
@@ -150,7 +149,29 @@ class EnterHere {
     }
     
     private void displayResources() {
-    	
+    	sop(
+    		"(1) Publications\n"+
+    		"(2) Conference Rooms\n"+
+    		"(3) Study Rooms\n"+
+    		"(4) Media-Production Rooms\n"+
+    		"(5) Technology Consultation\n"+
+    		"(6) Cameras"
+		);
+    	switch (console.nextInt()) {
+    		case 1:
+    			displayResourcesPublications();
+    			break;
+    		case 2:
+    			break;
+    		case 3:
+    			break;
+    		case 4:
+    			break;
+    		case 5:
+    			break;
+    		case 6:
+    			break;
+    	}
     }
     
     private void displayCheckedOutResources() {
@@ -167,6 +188,47 @@ class EnterHere {
     
     private void displayDueBalance() {
     	
+    }
+    
+    private void displayResourcesPublications() {
+		sop(db.listPublications); // print publications list info
+		sop("(1) Go back (2) select publication");
+		int resu = console.nextInt();
+		if (resu == 1) {
+			displayResources();
+		} else if (resu == 2) {
+			// select specific publication
+			sop("enter publication id");
+			String idres = console.next();
+			if (db.hasPublication(idres)) {
+				sop(db.printPublicationInfo(idres)); // print publication info
+				// determine if the publication is checked out by the user
+				if (!db.isPublicationCheckedOutBy(currentID, idres)) {
+					// ask to request it
+					sop("do you want to request this? 1 OR 0");
+					resu = console.nextInt();
+					if (resu = 1) {
+						// TODO If the requested publication is available, details like checkout date/time, return date/time should be taken as input 
+						db.checkoutPublication();
+					} else {
+						displayResources();
+					}
+				} else {
+					sop("do you want to renew this? 1 OR 0");
+					resu = console.nextInt();
+					if (resu = 1) {
+						db.checkoutPublication(currentID, idres);
+					} else {
+						displayResources();
+					}
+				}
+			} else {
+				sop("no publication");
+				displayResources();
+			}
+		} else {
+			
+		}
     }
     
     public void run() {

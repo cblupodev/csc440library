@@ -37,6 +37,20 @@ class DBBuilder {
     
     public void fillTables() {
         // import from https://drive.google.com/open?id=14-YvxM3s_P8XuszpTIbGdTIREDulbbQmm8u59GlqyYw
+        try {
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO Patrons ("+
+                "Jesse,"+
+                "Pinkman,"+
+                "S1,"+
+                "Chemistry"+
+                "American,"+
+                "false,"+
+                ""+
+                ")"
+            );
+            ps.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
     }
     
     public void deleteTables() {
