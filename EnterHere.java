@@ -3,10 +3,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
+import java.util.*;
 
 class EnterHere {
 	
 	private Connection con = null;
+	private DBInteraction db = null;
+	Scanner console = new Scanner(System.in);
 	
     public static void main(String[] args) {
         EnterHere enter = new EnterHere();
@@ -60,12 +63,112 @@ class EnterHere {
     	} catch (SQLException e) { e.printStackTrace(); }
     }
     
-    private void login() {
+    private void displayLogin() {
+    	// print beginning header
+    	sop("How to interact --> enter the adjacent numbers to go to the corresponding pages");
+    	sop("                    hit ctrl+c to exit");
+    	sop("");
+    	sop("Login as (1) Student OR (2) Faculty");
+    	int res = console.nextInt();
+    	if (res == 1 || res == 2) {
+    		// enter username and password
+    		sop("enter username   ");
+    		String username = console.next();
+    		sop("enter password");
+    		String password = console.next();
+    		if (db.isUser(username, password)) {
+    			// login succesfull
+    			displayHomepage();	
+    		} else {
+    			sop("login failed");
+    			displayLogin();
+    		}
+    	} else if (res == 0) {
+    		sop("Exited");
+    		System.exit(0);
+    	} else {
+    		sop("login failed, probably didn't enter 1 or 2");
+    		displayLogin();
+    	}
+    }
+    
+    private void displayHomepage() {
+    	sop(
+    		"(1) Profile"+
+    		"(2) Resources"+
+    		"(3) Checked-out Resources"+
+    		"(4) Resource Requests"+
+    		"(5) Notifications"+
+    		"(6) Due-Balance"
+    	);
+    	switch(console.nextInt) {
+    		sop()
+    		case 1:
+    			displayProfile();
+    			break;
+    		case 2:
+    			displayResources();
+    			break;
+			case 3:
+				displayCheckedOutResources();
+				break;
+			case 4:
+				displayResourceRequests();
+				break;
+			case 5:
+				displayNotifications();
+				break;
+			case 6:
+				displayDueBalance();
+				break;
+			default:
+				sop("failed. enter number 1 - 6");
+				displayHomepage();
+    	}
+    }
+    
+    private void displayProfile() {
+    	
+    }
+    
+    private void displayResources() {
+    	
+    }
+    
+    private void displayCheckedOutResources() {
+    	
+    }
+    
+    private void displayResourceRequests() {
+    	
+    }
+    
+    private void displayNotifications() {
+    	
+    }
+    
+    private void displayDueBalance() {
     	
     }
     
     public void run() {
+    	// connect to the databse
     	connectDatabase("pscarlso", "001063754");
-    	createTables();
+    	
+    	// cleaer the tables and fill in data
+    	// DBBuilder builder = new DBBuilder(con);
+    	// builder.deleteTables();
+    	// builder.createTables();
+    	// builder.fillTables();
+    	
+    	db = new DBInteraction(con);
+    	
+    	// TODO start user interface interaction
+    	displayLogin();
+    }
+    
+    // Have to make this dumb thing because System.out.println takes too long to type
+    private void sop(Object obj) {
+    	System.out.println(obj);
     }
 }
