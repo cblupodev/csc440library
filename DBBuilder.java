@@ -13,6 +13,7 @@ class DBBuilder {
         this.con = con;
     }
     
+    // create tables from https://drive.google.com/open?id=1BoMzhg6PL0osWdHVDvKXC_lRCbDRALIDwIVQD68d3pY
     public void createTables() {
         try {
             PreparedStatement ps = con.prepareStatement(
@@ -33,7 +34,7 @@ class DBBuilder {
     }
     
     public void fillTables() {
-        
+        // import from https://drive.google.com/open?id=14-YvxM3s_P8XuszpTIbGdTIREDulbbQmm8u59GlqyYw
     }
     
     public void deleteTables() {
