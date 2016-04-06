@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 
+
+// use to construct the database
 class DBBuilder {
     
     private Connection con = null;

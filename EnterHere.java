@@ -10,6 +10,7 @@ class EnterHere {
 	private Connection con = null;
 	private DBInteraction db = null;
 	Scanner console = new Scanner(System.in);
+	private Integer currentID;
 	
     public static void main(String[] args) {
         EnterHere enter = new EnterHere();
@@ -76,8 +77,10 @@ class EnterHere {
     		String username = console.next();
     		sop("enter password");
     		String password = console.next();
-    		if (db.isUser(username, password)) {
+    		int log = db.isUser(username, password);
+    		if (log != -1) {
     			// login succesfull
+    			currentID = log;
     			displayHomepage();	
     		} else {
     			sop("login failed");
@@ -93,16 +96,16 @@ class EnterHere {
     }
     
     private void displayHomepage() {
+    	sop("Go to:\n");
     	sop(
-    		"(1) Profile"+
-    		"(2) Resources"+
-    		"(3) Checked-out Resources"+
-    		"(4) Resource Requests"+
-    		"(5) Notifications"+
-    		"(6) Due-Balance"
+    		"(1) Profile\n"+
+    		"(2) Resources\n"+
+    		"(3) Checked-out Resources\n"+
+    		"(4) Resource Requests\n"+
+    		"(5) Notifications\n"+
+    		"(6) Due-Balance\n"
     	);
-    	switch(console.nextInt) {
-    		sop()
+    	switch(console.nextInt()) {
     		case 1:
     			displayProfile();
     			break;
@@ -128,7 +131,22 @@ class EnterHere {
     }
     
     private void displayProfile() {
-    	
+    	db.printProfile();
+    	sop("(1) Go back (2) update profile");
+    	int resu = console.nextInt();
+    	sop("resu   "+resu);
+    	if (resu == 1) {
+    		displayHomepage();
+    	} else if (resu == 2) {
+    		sop("Enter attribute to update");
+    		String attribute = console.next();
+    		sop("Enter value");
+    		String val = console.next();
+    		db.updateProfile(currentID, attribute, val);
+    	} else {
+    		sop("failed");
+    	}
+		displayProfile();
     }
     
     private void displayResources() {
