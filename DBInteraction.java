@@ -76,12 +76,30 @@ class DBInteraction {
         return true;
     }
     
-    // Any requests which violate any of the constraints mentioned in the description should not be entertained. 
-    // If the student requests for a publication that is not currently available, the request should be added to a waitlist 
-    // and an appropriate message should be displayed. If the requested publication is available, details like checkout date/time, 
-    // return date/time should be taken as input (refer to the description).If the request to issue a book is granted
-    // (refer to the constraints on various publications), then the status of the book (issued, waitlisted) should be updated.
-    // also handle the case if the user is renewing or requesting
+    /*
+    Any requests which violate any of the constraints mentioned in the description should not be entertained. 
+    If the student requests for a publication that is not currently available, the request should be added to a waitlist 
+    and an appropriate message should be displayed. If the requested publication is available, details like checkout date/time, 
+    return date/time should be taken as input (refer to the description).If the request to issue a book is granted
+    (refer to the constraints on various publications), then the status of the book (issued, waitlisted) should be updated.
+    also handle the case if the user is renewing or requesting
+    
+    Assume that checkout time always starts at the time the user requests the item
+    https://moodle1516-courses.wolfware.ncsu.edu/mod/forum/discuss.php?d=239661 
+    
+    Don't forget to account for reserved books
+    
+    A patron is only allowed to have one copy of particular publication checked out, at a time.
+    
+    From the Project Description ↓
+    Checkout and Return Policy
+    The checkout process is initiated by the patron (after finding the desired item(s)). The checkout process updates the 
+    appropriate tables in the database with respect to availability and assigns return dates to items based on relevant rules 
+    for the type of holding and type of patron (mentioned throughout the description). Checkout should only be possible 
+    for available items. Additional requests for items not currently available will be placed on a wait queue and serviced on a 
+    first-come-first-serve based. However, faculty always have priority on the wait queue. Checked out items can be renewed by a 
+    patron only if no patrons are waiting for item. If it is possible to renew, the due dates and relevant data are updated in database.
+    */
     public void checkoutPublication(String userid, String pubid) {
         
     }
@@ -99,6 +117,9 @@ class DBInteraction {
     }
     
     // Renews the check out for the particular resource
+    
+    // There is no limit to the number of times a publication can be renewed. Also, it can be renewed for the same amount of time as it can be issued for in the first place
+    // https://moodle1516-courses.wolfware.ncsu.edu/mod/forum/discuss.php?d=243748
     public void renewCheckedOutResource(String userid, String resourceid){
         
     }
@@ -128,6 +149,23 @@ class DBInteraction {
     // Can we assume that when someone chooses to clear their due-balance all overdue materials are checked back in? Answer → yes
     // https://moodle1516-courses.wolfware.ncsu.edu/mod/forum/discuss.php?d=239657
     public void clearDueBalance(String userid) {
+        
+    }
+    
+    // print info for conference, study, and media rooms
+    public String printRooms(String library, int occupants) {
+        return "";
+    }
+    
+    // Find if the room id is availble for booking to the user
+    // Conference rooms can't be booked by students
+    // return "Conference" OR "Media" OR "Study" OR "" (if not available)
+    public String roomAvailability(String id, Boolean isStudent) {
+        return "Media";
+    }
+    
+    // book a media room
+    public void bookMediaRoom(String userId, int roomId, int chairNum) {
         
     }
 }

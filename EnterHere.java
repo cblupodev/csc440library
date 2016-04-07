@@ -30,7 +30,7 @@ class EnterHere {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 		} catch (ClassNotFoundException e) {
-			System.out.println("Where is your Oracle JDBC Driver?");
+			System.out.println("Where isz your Oracle JDBC Driver?");
 			e.printStackTrace();
 			return;
 		}
@@ -153,22 +153,25 @@ class EnterHere {
     
     private void displayResources() {
     	sop(
-    		"(1) Publications\n"+
-    		"(2) Conference/Study/Media-production room\n"+
-    		"(3) Technology Consultation\n"+
-    		"(4) Cameras"
+    		"(1) Go back"
+    		"(2) Publications\n"+
+    		"(3) Conference/Study/Media-production room\n"+
+    		"(4) Technology Consultation\n"+
+    		"(5) Cameras"
 		);
     	switch (console.nextInt()) {
     		case 1:
+    			displayHomepage();
+    		case 2:
     			displayResourcesPublications();
     			break;
-    		case 2:
+    		case 3:
     			displayResourcesConferenceStudyMediaRooms();
     			break;
-    		case 3:
+    		case 4:
     			displayResourcesTechnologyConsultation();
     			break;
-    		case 4:
+    		case 5:
     			displayResourcesCameras();
     			break;
     	}
@@ -178,20 +181,24 @@ class EnterHere {
     	ArrayList requests = new ArrayList();
     	requests = db.getCheckedOutResources(currentID);
     	
-    	if(requests.size() == 0){
-    		sop("No checked out resources.");
+
+		for(int x = 0; x < requests.size(); x++){
+    		sop("(" + x + ") " + requests[x].getName());
+    	}
+    	sop("(" + requests.size() + ") Go back");
+    	
+    	int res = console.nextInt();
+    	if(res == 0){
     		displayHomepage();
     	} else {
-    		for(int x = 0; x < requests.size(); x++){
-	    		sop("(" + x + ") " + requests[x].getName());
-	    	}
-	    	
-	    	int res = console.nextInt();
-	    	if(res < requests.size()){
-	    		sop(db.printResourceDetails(requests[res].id));
+    		resource = db.printResourceDetails(res);
+    		sop(resource);
+    		if (resource.equals("Inalid ID")) {
+    			displayHomepage();
+    		} else {
 	    		sop("Would you like to renew this resource?\n"+
-	    			"(1) Yes\n"+
-	    			"(2) No"
+	    			"(0) No\n"
+	    			"(1) Yes"+
 	    		);
 	    		if(console.nextInt() == 1){
 	    			db.renewCheckedOutResource(currentID, requests[res].id);
@@ -199,11 +206,7 @@ class EnterHere {
 	    		} else {
 	    			displayHomepage();
 	    		}
-	    		
-	    	} else {
-	    		sop("failed.  Enter number between 1-" + requests.size());
-	    		displayHomepage();
-	    	}
+    		}
     	}
     }
     
@@ -299,24 +302,86 @@ class EnterHere {
 		}
     }
 	
-	// On selecting the ‘Conference/Study/Media-production room’ option, 
-	// the number of occupants and library should be taken as input. 
-	// Based on the input the list of relevant study rooms and its details should be displayed. 
-	// On further selecting a particular study room, the user should be allowed to book the room 
-	// for a particular duration on a particular date. 
-	// Follow the rules mentioned in the project description for a valid request. 
-	// On trying to book the media production room, the constraints for booking should be followed. 
-	// There will be an option to choose the type of instruments required and depending on
-	// that a list of available rooms should be displayed and the user should be allow to book the room. 
-	// Kindly refer to the specification given in the project description for the booking rules, instruments, etc.
+	/* On selecting the ‘Conference/Study/Media-production room’ option, 
+	 the number of occupants and library should be taken as input. 
+	 Based on the input the list of relevant study rooms and its details should be displayed. 
+	 On further selecting a particular study room, the user should be allowed to book the room 
+	 for a particular duration on a particular date. 
+	 Follow the rules mentioned in the project description for a valid request. 
+	 On trying to book the media production room, the constraints for booking should be followed. 
+	 There will be an option to choose the type of instruments required and depending on
+	 that a list of available rooms should be displayed and the user should be allow to book the room. 
+	 Kindly refer to the specification given in the project description for the booking rules, instruments, etc. */
 	private void displayResourcesConferenceStudyMediaRooms() {
 		sop("Enter the libray to see rooms for: Hunt OR Hill");
 		String library = console.next();
-		sop("enter occupants as an integer");
+		sop("Enter occupants as an integer");
 		int occupants = console.nextInt();
-		sop(db.printRooms());
+		sop(db.printRooms(library, occupants));
+		sop("(1) go back (2) book a room");
+		int res = console.nextInt();
+		if (res == 1) {
+			displayResources();
+		} else if (res == 2) {
+			sop("Enter room id");
+			// don't forget to convert this id into the appropriate int if need be, difference between conference and study/media rooms ids
+			String id = console.next();
+			String avail = db.roomAvailability(id, isStudent);
+			if (isStudent && (avail != "" || avail != "Conference")) {
+				// student is allowed to book this room
+				sop("enter reservation duration"); // todo figure out what format this is
+				String duration = console.next();
+				sop("enter reservation date, must be in this format YYYY-MON-DD HH24:MI"+
+					"example '2003/05/03 21:02:44'");
+				String date = console.next();
+				if (avail == "Media") {
+					sop("enter instrument: 	(1) 'Mini Keyboard', (2) 'Microphones', (3) 'Cassette deck', (4) 'Guitar', (5) '88-key MIDI Keyboard', (6) 'Drum'");
+					int instrNum = console.nextInt();
+					String[] instrumentsList = {"Mini Keyboard", "Microphones", "Cassette deck", "Guitar", "88-key MIDI Keyboard", "Drum"};
+					String instrString = instrumentsList[instrNum - 1];
+					sop("enter number of chairs wanted 2 OR 4 OR 6");
+					String chairNum = console.nextInt();
+					db.bookMediaRoom(currentID, id, instrString, chairNum);
+					displayResources();
+				}
+				db.reserveRoom(currentID, date, duration);
+				displayResources();
+			} else if (!isStudent && (avail != "")) {
+				// student is allowed to book this room
+				sop("enter reservation duration"); // todo figure out what format this is
+				String duration = console.next();
+				sop("enter reservation date, must be in this format YYYY-MON-DD HH24:MI"+
+					"example '2003/05/03 21:02:44'");
+				String date = console.next();
+				if (avail == "Media") {
+					sop("enter instrument: 	(1) 'Mini Keyboard', (2) 'Microphones', (3) 'Cassette deck', (4) 'Guitar', (5) '88-key MIDI Keyboard', (6) 'Drum'");
+					int instrNum = console.nextInt();
+					String[] instrumentsList = {"Mini Keyboard", "Microphones", "Cassette deck", "Guitar", "88-key MIDI Keyboard", "Drum"};
+					String instrString = instrumentsList[instrNum - 1];
+					sop("enter number of chairs wanted 2 OR 4 OR 6");
+					String chairNum = console.nextInt();
+					db.bookMediaRoom(currentID, id, instrString, chairNum);
+					displayResources();
+				}
+				db.reserveRoom(currentID, date, duration);
+				displayResources();
+			} else {
+				sop("failed");
+				displayResources();
+			}
+			sop("");
+		} else {
+			displayResources();
+		}
+		String roomid = console.next();
+		
 	}
 	
+	/*On selecting Technology consultation option, the patron should be given the option to schedule a new a
+	ppointment or view all their past appointments. The option to schedule a new appointment should take as input the location, 
+	3 date and time slots, and the topic that they need help with, as mentioned in the description. 
+	The option to view the log of past appointments should display all the details of that meeting along with the 
+	option to give feedback for that meeting. */
 	private void displayResourcesTechnologyConsultation() {
 		
 	}
