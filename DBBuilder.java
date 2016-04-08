@@ -256,9 +256,11 @@ class DBBuilder {
                 "   first_name varchar(64) NOT NULL,"+
                 "	last_name varchar(64) NOT NULL,"+
                 "	ID character(16),"+
-                "	dept character(3),"+
+                "	dept varchar(36),"+
                 "	nationality varchar(64),"+
                 "	delinquent boolean NOT NULL,"+
+                "   user_name varchar(32) NOT NULL,"+
+                "   password varchar(32) NOT NULL,"+
                 "	PRIMARY KEY (ID)"+
                 ")"
             );
@@ -392,9 +394,12 @@ class DBBuilder {
                 "	street varchar(64) NOT NULL,"+
                 "	city varchar(64) NOT NULL,"+
                 "	postcode character(5) NOT NULL,"+
+                "   state character(2) NOT NULL,"+
                 "	dob datetime NOT NULL,"+
                 "	sex varchar(32),"+
                 "	classification varchar(16) NOT NULL,"+
+                "   degree_program varchar(16) NOT NULL,"+
+                "   category varchar(16) NOT NULL,"+
                 "	PRIMARY KEY (ID),"+
                 "	FOREIGN KEY (ID) REFERENCES Patrons (ID)"+
                 "		ON UPDATE CASCADE"+
@@ -499,7 +504,8 @@ class DBBuilder {
     public void fillTables() {
         // import from https://drive.google.com/open?id=14-YvxM3s_P8XuszpTIbGdTIREDulbbQmm8u59GlqyYw
         try {
-            PreparedStatement ps = con.prepareStatement(
+            Statement s = con.createStatement();
+            s.executeUpdate(
                 "INSERT INTO Patrons ("+
                 "Jesse,"+
                 "Pinkman,"+
@@ -510,7 +516,6 @@ class DBBuilder {
                 ""+
                 ")"
             );
-            ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
     
@@ -556,7 +561,7 @@ class DBBuilder {
             //Explicitly commit statements to apply changes
             con.commit();
         } catch (BatchUpdateException e) {
-            System.out.println("BatchUpdateException was thrown but that's probably because you tried to delete tables that don't exist"); 
+            System.out.println("BatchUpdateException was thrown but that's probably because you tried to delete tables that don't exist, don't worry about it"); 
         } catch (SQLException e) { 
             e.printStackTrace(); 
         }

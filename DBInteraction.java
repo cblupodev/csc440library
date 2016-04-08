@@ -106,14 +106,13 @@ class DBInteraction {
     }
     
     // List of resources currently checked out by the user.
-    public ArrayList<Integer> getCheckedOutResources(String userid) {
-        ArrayList<Integer> ary = new ArrayList<Integer>();
+    public String printCheckedOutResources(String userid) {
         
-        return ary;
+        return "";
     }
     
     // For a particular resource, its details, check-out date/time, due date/time should be displayed
-    public String printResourceDetails(String resourceid){
+    public String printResourceDetails(String userid, String resourceid){
         return "";
     }
     
@@ -188,5 +187,17 @@ class DBInteraction {
     // reserve a non-media room
     public void reserveConferenceStudyRoom(String userid, int roomid, String reserveDate, String reserveTime) {
         
+    }
+    
+    // display all cameras
+    public String printCameras(){
+        return "";
+    }
+    
+    // attempt to reserve a camera
+    // return "camera reserved" and due date if it is reserved
+    // return "on waitlist" if camera is already reserved
+    public String requestCameraReservation(String userid, String cameraid, String date){
+        return "";
     }
 }

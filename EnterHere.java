@@ -180,36 +180,29 @@ class EnterHere {
     }
     
     private void displayCheckedOutResources() {
-  //  	ArrayList<Integer> requests = new ArrayList<Integer>();
-  //  	requests = db.getCheckedOutResources(currentID);
-    	
-
-		// for(int x = 0; x < requests.size(); x++){
-  //  		sop("(" + x + ") " + requests.get(x).getName());
-  //  	}
-  //  	sop("(" + requests.size() + ") Go back");
-    	
-  //  	int res = console.nextInt();
-  //  	if(res == 0){
-  //  		displayHomepage();
-  //  	} else {
-  //  		String resource = db.printResourceDetails(res); // this is asking for a resource ID
-  //  		sop(resource);
-  //  		if (resource.equals("Inalid ID")) {
-  //  			displayHomepage();
-  //  		} else {
-	 //   		sop("Would you like to renew this resource?\n"+
-	 //   			"(0) No\n"+
-	 //   			"(1) Yes"
-	 //   		);
-	 //   		if(console.nextInt() == 1){
-	 //   			db.renewCheckedOutResource(currentID, requests[res].id);
-	 //   			displayHomepage();
-	 //   		} else {
-	 //   			displayHomepage();
-	 //   		}
-  //  		}
-  //  	}
+    	sop(db.printCheckedOutResources(currentID));
+    	sop("Enter 1 to go back or resource ID to view details");
+    	String res = console.next();
+    	if(res.equals("1")){
+    		displayHomepage();
+    	} else {
+    		String resource = db.printResourceDetails(currentID, res); // this is asking for a resource ID
+    		sop(resource);
+    		if (resource.equals("Invalid ID")) {
+    			displayHomepage();
+    		} else {
+	    		sop("Would you like to renew this resource?\n"+
+	    			"(0) No\n"+
+	    			"(1) Yes"
+	    		);
+	    		if(console.nextInt() == 1){
+	    			db.renewCheckedOutResource(currentID, res);
+	    			displayHomepage();
+	    		} else {
+	    			displayHomepage();
+	    		}
+    		}
+    	}
     }
     
     // The option 'Resource Request' will display the list of resources requested by the user. 
@@ -429,8 +422,42 @@ class EnterHere {
 		}
 	}
 	
+	// On selecting the ‘Camera’ option, list of available cameras should be displayed. On 
+	// selecting a particular camera, its details should be shown. The student can select a 
+	// camera and request for it. In the request form various information like check out date, 
+	// time etc (refer to the description for more details) should be taken as input. If the request 
+	// is made for a camera that is already available or will be available by the check out date 
+	// mentioned by the student in the request form, then the due date should be displayed and 
+	// necessary changes to the status of the camera should be recorded. If the request is for a 
+	// camera that has already been requested or checked out then this request is added to a 
+	// waitlist and appropriate message should be displayed.
 	private void displayResourcesCameras() {
-		
+		sop(db.printCameras());
+    	sop("Enter 1 to go back or camera ID to view details");
+    	String res = console.next();
+    	if(res.equals("1")){
+    		displayHomepage();
+    	} else {
+    		String resource = db.printResourceDetails(currentID, res); // this is asking for a resource ID
+    		sop(resource);
+    		if (resource.equals("Invalid ID")) {
+    			displayHomepage();
+    		} else {
+	    		sop("Would you like to reserve this camera?\n"+
+	    			"(0) No\n"+
+	    			"(1) Yes"
+	    		);
+	    		if(console.nextInt() == 1){
+	    			sop("enter desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
+						"example '2003/05/03 21:02:44'");
+					String date = console.next();
+					sop(db.requestCameraReservation(currentID, res, date);
+					displayHomepage();
+	    		} else {
+	    			displayHomepage();
+	    		}
+    		}
+    	}
 	}
 
     public void run() {
@@ -440,7 +467,7 @@ class EnterHere {
     	// cleaer the tables and fill in data
     	
     	DBBuilder builder = new DBBuilder(con);
-    	builder.deleteTables();
+    	// builder.deleteTables();
     	// builder.createTables();
     	// builder.fillTables();
     	
