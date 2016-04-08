@@ -1,4 +1,3 @@
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,6 +11,7 @@ class EnterHere {
 	private DBInteraction db = null;
 	private Scanner console = new Scanner(System.in);
 	private String currentID;
+	private Boolean isStudent = false; // true = student, false = faculty
 	
     public static void main(String[] args) {
         EnterHere enter = new EnterHere();
@@ -24,7 +24,8 @@ class EnterHere {
     // pscarlso
     // 001063754
     // source https://moodle1516-courses.wolfware.ncsu.edu/mod/forum/discuss.php?d=229176
-    private void connectDatabase(String username, String password) {
+    private Connection connectDatabase(String username, String password) {
+    	
 		System.out.println("-------- Oracle JDBC Connection Testing ------");
 
 		try {
@@ -32,7 +33,7 @@ class EnterHere {
 		} catch (ClassNotFoundException e) {
 			System.out.println("Where isz your Oracle JDBC Driver?");
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
 		System.out.println("Oracle JDBC Driver Registered!");
@@ -42,15 +43,16 @@ class EnterHere {
 		} catch (SQLException e) {
 			System.out.println("Connection Failed! Check output console");
 			e.printStackTrace();
-			return;
+			return null;
 		}
 
 		if (con != null) {
 			System.out.println("You made it, take control your database now!");
 		} else {
 			System.out.println("Failed to make connection!");
-		}    
-    	
+		}
+		
+		return con;
     }
     
     // print all the table names
@@ -153,7 +155,7 @@ class EnterHere {
     
     private void displayResources() {
     	sop(
-    		"(1) Go back"
+    		"(1) Go back"+
     		"(2) Publications\n"+
     		"(3) Conference/Study/Media-production room\n"+
     		"(4) Technology Consultation\n"+
@@ -178,36 +180,36 @@ class EnterHere {
     }
     
     private void displayCheckedOutResources() {
-    	ArrayList requests = new ArrayList();
-    	requests = db.getCheckedOutResources(currentID);
+  //  	ArrayList<Integer> requests = new ArrayList<Integer>();
+  //  	requests = db.getCheckedOutResources(currentID);
     	
 
-		for(int x = 0; x < requests.size(); x++){
-    		sop("(" + x + ") " + requests[x].getName());
-    	}
-    	sop("(" + requests.size() + ") Go back");
+		// for(int x = 0; x < requests.size(); x++){
+  //  		sop("(" + x + ") " + requests.get(x).getName());
+  //  	}
+  //  	sop("(" + requests.size() + ") Go back");
     	
-    	int res = console.nextInt();
-    	if(res == 0){
-    		displayHomepage();
-    	} else {
-    		resource = db.printResourceDetails(res);
-    		sop(resource);
-    		if (resource.equals("Inalid ID")) {
-    			displayHomepage();
-    		} else {
-	    		sop("Would you like to renew this resource?\n"+
-	    			"(0) No\n"
-	    			"(1) Yes"+
-	    		);
-	    		if(console.nextInt() == 1){
-	    			db.renewCheckedOutResource(currentID, requests[res].id);
-	    			displayHomepage();
-	    		} else {
-	    			displayHomepage();
-	    		}
-    		}
-    	}
+  //  	int res = console.nextInt();
+  //  	if(res == 0){
+  //  		displayHomepage();
+  //  	} else {
+  //  		String resource = db.printResourceDetails(res); // this is asking for a resource ID
+  //  		sop(resource);
+  //  		if (resource.equals("Inalid ID")) {
+  //  			displayHomepage();
+  //  		} else {
+	 //   		sop("Would you like to renew this resource?\n"+
+	 //   			"(0) No\n"+
+	 //   			"(1) Yes"
+	 //   		);
+	 //   		if(console.nextInt() == 1){
+	 //   			db.renewCheckedOutResource(currentID, requests[res].id);
+	 //   			displayHomepage();
+	 //   		} else {
+	 //   			displayHomepage();
+	 //   		}
+  //  		}
+  //  	}
     }
     
     // The option 'Resource Request' will display the list of resources requested by the user. 
@@ -244,7 +246,7 @@ class EnterHere {
     // If the request to issue a book is granted (refer to the constraints on various publications), 
     // then the status of the book (issued, waitlisted) should be updated.
     private void displayResourcesPublications() {
-		sop(db.listPublications); // print publications list info
+		sop(db.listPublications()); // print publications list info
 		sop("(1) Go back (2) select publication");
 		int res = console.nextInt();
 		if (res == 1) {
@@ -264,7 +266,7 @@ class EnterHere {
 					// ask to request it
 					sop("do you want to request/renew this? 1 OR 0");
 					res = console.nextInt();
-					if (res = 1) {
+					if (res == 1) {
 						// If the requested publication is available, details like checkout date/time, return date/time should be taken as input 
 						sop(
 							"enter checkout date, must be in this format YYYY-MON-DD HH24:MI"+
@@ -315,7 +317,7 @@ class EnterHere {
 	private void displayResourcesConferenceStudyMediaRooms() {
 		sop("Enter the libray to see rooms for: Hunt OR Hill");
 		String library = console.next();
-		sop("Enter occupants as an integer");
+		sop("Enter capacity as an integer");
 		int occupants = console.nextInt();
 		sop(db.printRooms(library, occupants));
 		sop("(1) go back (2) book a room");
@@ -325,7 +327,7 @@ class EnterHere {
 		} else if (res == 2) {
 			sop("Enter room id");
 			// don't forget to convert this id into the appropriate int if need be, difference between conference and study/media rooms ids
-			String id = console.next();
+			int id = console.nextInt();
 			String avail = db.roomAvailability(id, isStudent);
 			if (isStudent && (avail != "" || avail != "Conference")) {
 				// student is allowed to book this room
@@ -340,35 +342,16 @@ class EnterHere {
 					String[] instrumentsList = {"Mini Keyboard", "Microphones", "Cassette deck", "Guitar", "88-key MIDI Keyboard", "Drum"};
 					String instrString = instrumentsList[instrNum - 1];
 					sop("enter number of chairs wanted 2 OR 4 OR 6");
-					String chairNum = console.nextInt();
-					db.bookMediaRoom(currentID, id, instrString, chairNum);
+					int chairNum = console.nextInt();
+					db.reserveMediaRoom(currentID, id, instrString, chairNum);
 					displayResources();
+				} else {
+					db.reserveConferenceStudyRoom(currentID, id, date, duration); // this will reject if student tries to reserve conference
 				}
-				db.reserveRoom(currentID, date, duration);
-				displayResources();
-			} else if (!isStudent && (avail != "")) {
-				// student is allowed to book this room
-				sop("enter reservation duration"); // todo figure out what format this is
-				String duration = console.next();
-				sop("enter reservation date, must be in this format YYYY-MON-DD HH24:MI"+
-					"example '2003/05/03 21:02:44'");
-				String date = console.next();
-				if (avail == "Media") {
-					sop("enter instrument: 	(1) 'Mini Keyboard', (2) 'Microphones', (3) 'Cassette deck', (4) 'Guitar', (5) '88-key MIDI Keyboard', (6) 'Drum'");
-					int instrNum = console.nextInt();
-					String[] instrumentsList = {"Mini Keyboard", "Microphones", "Cassette deck", "Guitar", "88-key MIDI Keyboard", "Drum"};
-					String instrString = instrumentsList[instrNum - 1];
-					sop("enter number of chairs wanted 2 OR 4 OR 6");
-					String chairNum = console.nextInt();
-					db.bookMediaRoom(currentID, id, instrString, chairNum);
-					displayResources();
-				}
-				db.reserveRoom(currentID, date, duration);
-				displayResources();
 			} else {
 				sop("failed");
-				displayResources();
 			}
+			displayResources();
 			sop("");
 		} else {
 			displayResources();
@@ -377,27 +360,87 @@ class EnterHere {
 		
 	}
 	
-	/*On selecting Technology consultation option, the patron should be given the option to schedule a new a
+	/* On selecting Technology consultation option, the patron should be given the option to schedule a new a
 	ppointment or view all their past appointments. The option to schedule a new appointment should take as input the location, 
 	3 date and time slots, and the topic that they need help with, as mentioned in the description. 
 	The option to view the log of past appointments should display all the details of that meeting along with the 
 	option to give feedback for that meeting. */
 	private void displayResourcesTechnologyConsultation() {
+		// cblupo, I changed Go back to '1' because I used 1 in earlier method
+		sop("(1) Go back\n"+
+			"(2) Schedule new appointment\n"+
+			"(3) View past appointments"
+		);
+		int res = console.nextInt();
 		
+		switch(res){
+			case 1:{
+				displayHomepage();
+				break;
+			}
+			case 2:{
+				//schedule new appointment
+				String location;
+				String date1, date2, date3;
+				String topic;
+				sop("enter desired library (Hunt OR Hill)");
+				location = console.next();
+				sop("enter first desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
+					"example '2003/05/03 21:02:44'");
+				date1 = console.next();
+				sop("enter second desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
+					"example '2003/05/03 21:02:44'");
+				date2 = console.next();
+				sop("enter thrid desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
+					"example '2003/05/03 21:02:44'");
+				date3 = console.next();
+				sop("enter the topic you need help with");
+				topic = console.next();
+				db.requestTechnologyConsultation(currentID, location, date1, date2, date3, topic);
+				displayHomepage();
+				break;
+			}
+			case 3:{
+				//view past appointments
+				sop(db.displayTechnologyConsultations(currentID));
+				sop("Enter the consultation ID to leave feedback for that consultation");
+				sop("Enter 0 to go back");
+				String resp = console.next();
+				if(resp.equals("0")){
+					displayHomepage();
+				} else {
+					sop("Enter feedback for consultation " + resp);
+					String feedback = console.next();
+					if(db.addTechnologyConsultationFeedback(resp, feedback)){
+						sop("Thanks for the feedback!");
+						displayHomepage();
+					} else {
+						sop("leaving feedback failed.");
+						displayHomepage();
+					}
+				}
+				break;
+			}
+			default:{
+				sop("failed. Enter one of the given numbers.");
+				displayHomepage();
+				break;
+			}
+		}
 	}
 	
 	private void displayResourcesCameras() {
 		
 	}
 
-
     public void run() {
     	// connect to the databse
-    	connectDatabase("pscarlso", "001063754");
+    	con = connectDatabase("pscarlso", "001063754");
     	
     	// cleaer the tables and fill in data
-    	// DBBuilder builder = new DBBuilder(con);
-    	// builder.deleteTables();
+    	
+    	DBBuilder builder = new DBBuilder(con);
+    	builder.deleteTables();
     	// builder.createTables();
     	// builder.fillTables();
     	

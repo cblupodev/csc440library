@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.util.*;
 
 
 // use to interact with the database using jdbc
@@ -100,7 +101,7 @@ class DBInteraction {
     first-come-first-serve based. However, faculty always have priority on the wait queue. Checked out items can be renewed by a 
     patron only if no patrons are waiting for item. If it is possible to renew, the due dates and relevant data are updated in database.
     */
-    public void checkoutPublication(String userid, String pubid) {
+    public void checkoutPublication(String userid, String pubid, String outDate, String inDate) {
         
     }
     
@@ -160,12 +161,32 @@ class DBInteraction {
     // Find if the room id is availble for booking to the user
     // Conference rooms can't be booked by students
     // return "Conference" OR "Media" OR "Study" OR "" (if not available)
-    public String roomAvailability(String id, Boolean isStudent) {
+    public String roomAvailability(int id, Boolean isStudent) {
         return "Media";
     }
     
     // book a media room
-    public void bookMediaRoom(String userId, int roomId, int chairNum) {
+    public void reserveMediaRoom(String userId, int roomId, String instrumentm, int chairNum) {
+        
+    }
+    
+    public void requestTechnologyConsultation(String userID, String location, String date1, String date2, String date3, String topic){
+        
+    }
+    
+    // Add feedback for a technology consultation
+    public boolean addTechnologyConsultationFeedback(String consID, String feedback){
+        
+        return true;
+    }
+    
+    // Find all technology consultations
+    public String displayTechnologyConsultations(String userID){
+        return "";
+    }
+    
+    // reserve a non-media room
+    public void reserveConferenceStudyRoom(String userid, int roomid, String reserveDate, String reserveTime) {
         
     }
 }
