@@ -227,17 +227,17 @@ class EnterHere {
     	displayHomepage();
     }
     
-    // On selecting the ‘Publications’ option, the list of all publications
-    // (including books, ebooks, journals and conference proceedings) will be displayed. 
-    // On further selecting an item from the list displayed, its relevant details will be shown, 
-    // along with the option to request/renew the book (if applicable). Any requests which violate 
-    // any of the constraints mentioned in the description should not be entertained. 
-    // If the student requests for a publication that is not currently available, 
-    // the request should be added to a waitlist and an appropriate message should be displayed. 
-    // If the requested publication is available, details like checkout date/time, 
-    // return date/time should be taken as input (refer to the description).
-    // If the request to issue a book is granted (refer to the constraints on various publications), 
-    // then the status of the book (issued, waitlisted) should be updated.
+    /** On selecting the Publications option, the list of all publications
+       (including books, ebooks, journals and conference proceedings) will be displayed. 
+       On further selecting an item from the list displayed, its relevant details will be shown, 
+       along with the option to request/renew the book (if applicable). Any requests which violate 
+       any of the constraints mentioned in the description should not be entertained. 
+       If the student requests for a publication that is not currently available, 
+       the request should be added to a waitlist and an appropriate message should be displayed. 
+       If the requested publication is available, details like checkout date/time, 
+       return date/time should be taken as input (refer to the description).
+       If the request to issue a book is granted (refer to the constraints on various publications), 
+       then the status of the book (issued, waitlisted) should be updated.*/
     private void displayResourcesPublications() {
 		sop(db.listPublications()); // print publications list info
 		sop("(1) Go back (2) select publication");
@@ -297,7 +297,7 @@ class EnterHere {
 		}
     }
 	
-	/* On selecting the ‘Conference/Study/Media-production room’ option, 
+	/* On selecting the Conference/Study/Media-production room option, 
 	 the number of occupants and library should be taken as input. 
 	 Based on the input the list of relevant study rooms and its details should be displayed. 
 	 On further selecting a particular study room, the user should be allowed to book the room 
@@ -422,15 +422,15 @@ class EnterHere {
 		}
 	}
 	
-	// On selecting the ‘Camera’ option, list of available cameras should be displayed. On 
-	// selecting a particular camera, its details should be shown. The student can select a 
-	// camera and request for it. In the request form various information like check out date, 
-	// time etc (refer to the description for more details) should be taken as input. If the request 
-	// is made for a camera that is already available or will be available by the check out date 
-	// mentioned by the student in the request form, then the due date should be displayed and 
-	// necessary changes to the status of the camera should be recorded. If the request is for a 
-	// camera that has already been requested or checked out then this request is added to a 
-	// waitlist and appropriate message should be displayed.
+	/** On selecting the Camera option, list of available cameras should be displayed. On 
+	 * selecting a particular camera, its details should be shown. The student can select a 
+	 * camera and request for it. In the request form various information like check out date, 
+	 * time etc (refer to the description for more details) should be taken as input. If the request 
+	 * is made for a camera that is already available or will be available by the check out date 
+	 * mentioned by the student in the request form, then the due date should be displayed and 
+	 * necessary changes to the status of the camera should be recorded. If the request is for a 
+	 *camera that has already been requested or checked out then this request is added to a 
+	 *waitlist and appropriate message should be displayed.*/
 	private void displayResourcesCameras() {
 		sop(db.printCameras());
     	sop("Enter 1 to go back or camera ID to view details");
@@ -451,7 +451,7 @@ class EnterHere {
 	    			sop("enter desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
 						"example '2003/05/03 21:02:44'");
 					String date = console.next();
-					sop(db.requestCameraReservation(currentID, res, date);
+					sop(db.requestCameraReservation(currentID, res, date));
 					displayHomepage();
 	    		} else {
 	    			displayHomepage();
@@ -467,8 +467,8 @@ class EnterHere {
     	// cleaer the tables and fill in data
     	
     	DBBuilder builder = new DBBuilder(con);
-    	// builder.deleteTables();
-    	// builder.createTables();
+    	builder.deleteTables();
+    	builder.createTables();
     	// builder.fillTables();
     	
     	db = new DBInteraction(con);

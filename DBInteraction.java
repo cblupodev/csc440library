@@ -92,7 +92,9 @@ class DBInteraction {
     
     A patron is only allowed to have one copy of particular publication checked out, at a time.
     
-    From the Project Description ↓
+    Students belonging to the hold should not be allowed any further check outs until the outstanding dues are cleared
+    
+    From the Project Description stated below
     Checkout and Return Policy
     The checkout process is initiated by the patron (after finding the desired item(s)). The checkout process updates the 
     appropriate tables in the database with respect to availability and assigns return dates to items based on relevant rules 
@@ -100,6 +102,8 @@ class DBInteraction {
     for available items. Additional requests for items not currently available will be placed on a wait queue and serviced on a 
     first-come-first-serve based. However, faculty always have priority on the wait queue. Checked out items can be renewed by a 
     patron only if no patrons are waiting for item. If it is possible to renew, the due dates and relevant data are updated in database.
+    
+    faculty differences https://github.ncsu.edu/cblupo/csc440library/issues/4
     */
     public void checkoutPublication(String userid, String pubid, String outDate, String inDate) {
         
@@ -110,12 +114,10 @@ class DBInteraction {
         
         return "";
     }
-    
     // For a particular resource, its details, check-out date/time, due date/time should be displayed
     public String printResourceDetails(String userid, String resourceid){
         return "";
     }
-    
     // Renews the check out for the particular resource
     
     // There is no limit to the number of times a publication can be renewed. Also, it can be renewed for the same amount of time as it can be issued for in the first place
@@ -123,35 +125,25 @@ class DBInteraction {
     public void renewCheckedOutResource(String userid, String resourceid){
         
     }
-    
     // The option 'Resource Request' will display the list of resources requested by the user. 
     // resources are Publications, Conference/Study/Media-production rooms, Technology Consultation, and Cameras
     // from forum, Resource request basically just shows a details of all the resources requested in the past as well as future reservations of that patron
     // return the string as it's displayed to the user
-    public String printResourceRequests(String userid) {
+    public String printResourceRequests(String userid) { return ""; }
         // use the ResourceRequest table
-        return "";
-    }
-    
     
     // The option 'Notifications' should display the list of reminders of due date for the issued books, 
     // camera-pickup or study-room reservation (as mentioned in the description).
     // return the string as it's displayed to the user
     public String printNotifications(String userid) {
-       return ""; 
-    }
-    
+       return ""; }
     public String printDueBalance(String userid) {
-        return "";
-    }
-    
+        return ""; }
     // Clear all dues 
-    // Can we assume that when someone chooses to clear their due-balance all overdue materials are checked back in? Answer → yes
+    // Can we assume that when someone chooses to clear their due-balance all overdue materials are checked back in? Answer is yes
     // https://moodle1516-courses.wolfware.ncsu.edu/mod/forum/discuss.php?d=239657
     public void clearDueBalance(String userid) {
-        
     }
-    
     // print info for conference, study, and media rooms
     public String printRooms(String library, int occupants) {
         return "";
@@ -165,6 +157,7 @@ class DBInteraction {
     }
     
     // book a media room
+    // Checking out the room can only happen after the designated start time for reservation
     public void reserveMediaRoom(String userId, int roomId, String instrumentm, int chairNum) {
         
     }
@@ -185,6 +178,8 @@ class DBInteraction {
     }
     
     // reserve a non-media room
+    // faculty differences https://github.ncsu.edu/cblupo/csc440library/issues/4
+    // Checking out the room can only happen after the designated start time for reservation
     public void reserveConferenceStudyRoom(String userid, int roomid, String reserveDate, String reserveTime) {
         
     }
