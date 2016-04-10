@@ -469,7 +469,7 @@ class EnterHere {
     	DBBuilder builder = new DBBuilder(con);
     	builder.deleteTables();
     	builder.createTables();
-    	// builder.fillTables();
+    	builder.fillTables();
     	
     	db = new DBInteraction(con);
     	
