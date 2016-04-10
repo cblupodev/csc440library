@@ -26,7 +26,6 @@ class DBBuilder {
                 "CREATE TABLE Books ("+
                 "   edition varchar(16) NOT NULL,"+
                 "   ISBN varchar(16) NOT NULL,"+
-                "   pub_Date date NOT NULL,"+
                 "	publisher varchar(32) NOT NULL,"+
                 "	PRIMARY KEY (ISBN)"+
                 ")"
@@ -59,7 +58,7 @@ class DBBuilder {
                 "	make varchar(32) NOT NULL,"+
                 "	model varchar(32) NOT NULL,"+
                 "	lens_configuration varchar(32) NOT NULL,"+
-                "	memory int NOT NULL,"+
+                "	memory varchar(8) NOT NULL,"+
                 "	PRIMARY KEY (camera_ID)"+
                 ")"
             );
@@ -69,9 +68,8 @@ class DBBuilder {
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Publication ("+
-                "	title varchar(16) NOT NULL,"+
+                "	title varchar(128) NOT NULL,"+
                 "	ID varchar(16) NOT NULL,"+
-                "	library varchar(16) NOT NULL,"+
                 "	has_electronic int NOT NULL,"+
                 "	authors varchar(64),"+
                 "	pub_year int,"+
@@ -119,9 +117,9 @@ class DBBuilder {
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Conference_Rooms ("+
                 "	place int NOT NULL,"+
+                "	library varchar(16) NOT NULL,"+
                 "	floor int NOT NULL,"+
                 "	capacity int NOT NULL,"+
-                "	library varchar(16) NOT NULL,"+
                 "	PRIMARY KEY (place, library)"+
                 ")"
             );
@@ -178,7 +176,7 @@ class DBBuilder {
                 "CREATE TABLE Courses_Students ("+
                 "	course_ID varchar(16) NOT NULL,"+
                 "	patron_ID varchar(16) NOT NULL,"+
-                "	PRIMARY KEY (course_ID),"+
+                "	PRIMARY KEY (course_ID, patron_ID),"+
                 "	FOREIGN KEY (course_ID) REFERENCES Courses (course_ID)"+
                 "		ON DELETE CASCADE,"+
                 "	FOREIGN KEY (patron_ID) REFERENCES Patrons (ID)"+
@@ -188,13 +186,12 @@ class DBBuilder {
             ps.executeUpdate();
         }  catch (SQLException e) { e.printStackTrace(); }
         
-        // todo 
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Courses_Faculty ("+
                 "	course_ID varchar(16) NOT NULL,"+
                 "	patron_ID varchar(16) NOT NULL,"+
-                "	PRIMARY KEY (course_ID),"+
+                "	PRIMARY KEY (course_ID, patron_ID),"+
                 "	FOREIGN KEY (course_ID) REFERENCES Courses (course_ID)"+
                 "		ON DELETE CASCADE,"+
                 "	FOREIGN KEY (patron_ID) REFERENCES Patrons (ID)"+
@@ -203,6 +200,7 @@ class DBBuilder {
             );
             ps.executeUpdate();
         }  catch (SQLException e) { e.printStackTrace(); }
+        
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Digital_Media_Assistants ("+
@@ -260,8 +258,8 @@ class DBBuilder {
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Journal("+
-                "	issn character(16) NOT NULL,"+
                 "	copy_number int NOT NULL,"+
+                "	issn character(16) NOT NULL,"+
                 "   PRIMARY KEY (issn)"+                
                 ")"
             );
@@ -272,11 +270,10 @@ class DBBuilder {
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Media_Rooms ("+
                 "	room_number int NOT NULL,"+
-                "	item1 varchar(16),"+
-                "	item2 varchar(16),"+
-                "	item3 varchar(16),"+
+                "	item1 varchar(32),"+
+                "	item2 varchar(32),"+
+                "	item3 varchar(32),"+
                 "	chairs int NOT NULL,"+
-                "   room_ID char(3) NOT NULL,"+
                 "	PRIMARY KEY(room_number)"+
                 ")"
             );
@@ -314,12 +311,12 @@ class DBBuilder {
             ps.executeUpdate();
         }  catch (SQLException e) { e.printStackTrace(); }
 
-        // todo datetime invalid data type
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Pub_Check_Out ("+
                 "	patron_ID varchar(16),"+
                 "	pub_ID varchar(16),"+
+                "   copy_num int,"+
                 "	check_out_date timestamp NOT NULL,"+
                 "	due_date timestamp NOT NULL,"+
                 "	late_fee int,"+
@@ -367,15 +364,14 @@ class DBBuilder {
             ps.executeUpdate();
         }  catch (SQLException e) { e.printStackTrace(); }
         
-        // todo need to change datetime datatype
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Resource_Request_History("+
-                "	patron_ID varchar(16),"+
-                "	resource_ID varchar(16),"+
+                "	patron_ID varchar(16) NOT NULL,"+
+                "	resource_ID varchar(16) NOT NULL,"+
                 "	check_out_time timestamp NOT NULL,"+
                 "	check_in_time timestamp,"+
-                "   duration int,"+
+                "   duration varchar(16),"+
                 "   tech_log_id INT,"+
                 "   PRIMARY KEY (patron_ID, resource_ID, check_out_time)"+
                 ")"
@@ -387,8 +383,8 @@ class DBBuilder {
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Reserved ("+
                 "   isbn varchar(16) NOT NULL,"+
-                "	due_date date,"+
                 "	course varchar(16),"+
+                "	due_date date,"+
                 "	PRIMARY KEY (isbn),"+
                 "	FOREIGN KEY (isbn) REFERENCES Books (isbn)"+
                 "		ON DELETE CASCADE"+
@@ -419,7 +415,7 @@ class DBBuilder {
                 "	city varchar(64) NOT NULL,"+
                 "   state character(2) NOT NULL,"+
                 "	postcode character(5) NOT NULL,"+
-                "	dob timestamp NOT NULL,"+
+                "	dob date NOT NULL,"+
                 "	sex varchar(32),"+
                 "	classification varchar(16) NOT NULL,"+
                 "   degree_program varchar(16) NOT NULL,"+
@@ -445,7 +441,6 @@ class DBBuilder {
             ps.executeUpdate();
         }  catch (SQLException e) { e.printStackTrace(); }
         
-        // todo table or view doesn't exist
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Study_Booked ("+
@@ -474,13 +469,12 @@ class DBBuilder {
                 "	timeSlot1b timestamp NOT NULL,"+
                 "	timeSlot2a timestamp NOT NULL,"+
                 "	timeSlot2b timestamp NOT NULL,"+
-                "	timeSlota timestamp NOT NULL,"+
-                "	timeSlotb timestamp NOT NULL,"+
+                "	timeSlot3a timestamp NOT NULL,"+
+                "	timeSlot3b timestamp NOT NULL,"+
                 "	library varchar(16) NOT NULL,"+
                 "	help_category varchar(16) NOT NULL,"+
-                "	PRIMARY KEY (tcID),"+
-                "	FOREIGN KEY (patronID) REFERENCES Patrons (ID)"+
-                "		ON DELETE CASCADE"+
+                "   assistant_ID varchar(16) NOT NULL,"+
+                "	PRIMARY KEY (tcID)"+
                 ")"
             );
             ps.executeUpdate();
@@ -498,11 +492,8 @@ class DBBuilder {
                 "      time_slotb timestamp NOT NULL,"+
                 "      tcID varchar(16) NOT NULL,"+
                 "      helpCategory varchar(16) NOT NULL,"+
-                "      PRIMARY KEY(tech_log_id),"+
-                "      FOREIGN KEY(patronID) REFERENCES Patrons(ID)"+
-                "	    	ON DELETE CASCADE,"+
-                "      FOREIGN KEY (tcID) REFERENCES TechConsult(tcID)"+
-                "	    	ON DELETE CASCADE"+
+                "	   assisstant_id varchar(16) NOT NULL,"+
+                "      PRIMARY KEY(tech_log_id)"+
                 ")"
             );
             ps.executeUpdate();
@@ -526,1067 +517,70 @@ class DBBuilder {
     }
     
     public void fillTables() {
-        // import from https://drive.google.com/open?id=14-YvxM3s_P8XuszpTIbGdTIREDulbbQmm8u59GlqyYw
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES ( Jesse, Pinkman, S1, Chemistry, American, false, jpink, jpink )"
-    //             "INSERT INTO Students VALUES  (S1, 123456789, 123456787, 1511 Graduate Lane, Raleigh, 27606,NC, 1988/Mar/10, Male, Undergraduate, BS, First Year)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try { // Walt Jr.
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Walt Jr., NULL, S2, Chemistry, American, true, wjr, wjr)"
-    //             "INSERT INTO Students VALUES (S2, 123456780, 123456781, 1512 Graduate Lane, Raleigh, NC, 27606, 1988/Mar/11, Male, Undergraduate, BS, Second Year)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Gale, Boetticher, S3, Chemistry, Chile, true, gboet, gboet)"
-    //             "INSERT INTO Students VALUES (S3, 123456782, 123456783, 1513 Graduate Lane, Raleigh, NC, 27606, 1988/Mar/12, Male, Undergraduate, BS, Third Year)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try { // Gale Boetticher.
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Saul, Goodman, S4, Chemistry, American, false, sgood, sgood)"
-    //             "INSERT INTO Students VALUES (S4, 123456784, 123456785, 1514 Graduate Lane, Raleigh, NC, 27606, 1988/Mar/01, Male, Graduate, MS, Second Year)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Walter, White, F1, Chemistry, American, false, wwhite, wwhite)"
-    //             "INSERT INTO Faculty VALUES (F1, Professor)"
-    //             "INSERT INTO Courses_Faculty (CH101, F1)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try { //Jesse Pinkman
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Gustavo, Fring, F2, Chemistry, American, false, gfring, gfring)"
-    //             "INSERT INTO Faculty VALUES (F2, Assistant Professor)"
-    //             "INSERT INTO Courses_Faculty (CH102, F2)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try { //Saul Goodman
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Hank, Schrader, F3, Chemistry, American, false, hschrad, hschrad)"
-    //             "INSERT INTO Faculty VALUES (F3, Associate Professor)"
-    //             "INSERT INTO Courses_Faculty (CH103, F3)"
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Patrons VALUES (Skyler, White, F4, Chemistry, American, false, swhite, swhite)"
-    //             "INSERT INTO Faculty VALUES (F4, Professor)"
-    //             "INSERT INTO Courses_Faculty (CH104, F4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Courses VALUES (CH101, B1)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S1)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S2)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S3)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Courses VALUES (CH102, B2)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S2)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S3)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //      try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Courses VALUES (CH103, B3)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S3)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S4)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S1)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Courses VALUES (CH104, B4)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S1)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S2)"
-    //             "INSERT INTO Courses_Students VALUES (CH101, S4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (Introduction to Chemistry, B1, true, SK Goyal, 2005)"
-    //             "INSERT INTO Books VALUES (1, B1, Pub1)"
-    //             "INSERT INTO Hardcopy VALUES (1, B1)"
-    //             "INSERT INTO Hardcopy VALUES (2, B1)"
-    //             "INSERT INTO Reserved VALUES (B1, CH101, 2016/Aug/08)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (Introduction to Organic Chemistry, B2, true, HC Verma, 2006)"
-    //             "INSERT INTO Books VALUES (2, B2, Pub2)"
-    //             "INSERT INTO Hardcopy VALUES (1, B2)"
-    //             "INSERT INTO Hardcopy VALUES (2, B2)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (Introduction to Physical Chemistry, B3, false, Resnick Halliday Walker, 2000)"
-    //             "INSERT INTO Books VALUES (3, B3, Pub3)"
-    //             "INSERT INTO Hardcopy VALUES (1, B3)"
-    //             "INSERT INTO Hardcopy VALUES (2, B3)"
-    //             "INSERT INTO Reserved VALUES (B3, CH103, 2016/Aug/08)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (Introduction to Inorganic Chemistry, B4, false, RC Mukherjee, 2005)
-    //             "INSERT INTO Books VALUES (4, B4, Pub4)
-    //             "INSERT INTO Hardcopy VALUES (1, B4)
-    //             "INSERT INTO Hardcopy VALUES (2, B4)
-
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //Courses
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (Journal of Web Semantic, J1, true, Roberto Navigli, 2010)
-    //             "INSERT INTO Journal VALUES (1, J1)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (International Journal on Semantic Web and Information, J2, true, Tim Berners Lee, 2011)
-    //             "INSERT INTO Journal VALUES (1, J2)
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (Optimization Techniques for Large Scale Graph Analytics on Map Reduce, C1, true, HyeongSik Kim, 2013)
-    //             "INSERT INTO Conf_Proceedings VALUES (C1, WWW)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication VALUES (An agglomerative query model for discovery in linked data: semantics and approach, C2, true, Sidan Gao, 2014)
-    //             "INSERT INTO Conf_Proceedings VALUES (C2, SIGMOD)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Conference_Rooms VALUES (1, Hunt, 3, 2)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms VALUES (2, Hunt, 3, 3)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms VALUES (3, Hill, 2, 4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Conference_Rooms VALUES (4, Hunt, 3, 3)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms VALUES (5, Hunt, 3, 4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms VALUES (6, Hill, 3, 4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms VALUES (7, Hunt, 2, 2)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Cameras VALUES (CA1, Hunt, Olympus, E-620, 14-42mm lens 1:3.5-5.6, 16G)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //C4
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Cameras VALUES (CA2, Hunt, Cannon, EOS Rebel T4i, 18-135mm EF-S IS STM Lens, 32G)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Cameras VALUES (CA3, Hunt, Cannon, EOS Rebel T4i, 18-135mm EF-S IS STM Lens, 32G)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S1, B2, 2015/Nov/08 00:00:00, 2015/Nov/13 00:00:00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S4, B4, 2015/Nov/07 00:00:00, 2015/Nov/11 00:00:00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //Books
-    //     //B1
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Pub_Check_Out VALUES (S2, B4, 1, 2015/Jul/01, 2015/Aug/08, 488.00)
-    //             "INSERT INTO Student_Hold_List VALUES (S2)
-    //             "INSERT INTO Resource_Request_History VALUES (S2, B4, 2015/Jul/01 00:00:00, NULL, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Pub_Check_Out VALUES (S3, B2, 1, 2015/Oct/01 00:00:00, 2015/Oct/10 00:00:00, 362.00)
-    //             "INSERT INTO Student_Hold_List VALUES (S3)
-    //             "INSERT INTO Resource_Request_History VALUES (S3, B2, 2015/Oct/01 00:00:00, NULL, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (F1, R3, 2015/Nov/01 09:00:00, 2015/Nov/01 11:30:00, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S1, R5, 2015/Oct/12 15:00:00, 2015/Oct/12 17:00:00, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (F4, R6, 2015/Nov/02 11:00:00, 2015/Nov/02 13:30:00, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //B2
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (F2, R1, 2015/Oct/20 09:00:00, 2015/Oct/20 10:30:00, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S3, CA2, 2015/Nov/13 00:00:00, 2015/Nov/19 00:00:00, NULL, NULL)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S2, CA3, 2015/Oct/16 00:00:00, NULL, NULL, NULL)"
-    //             "INSERT INTO Camera_Check_Out VALUES (S2, CA3, 2015/Oct/16, 2015/Oct/22, 4080.00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms VALUES (1, Mini Keyboard, Microphones, Cassette deck, 2)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //b3
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms VALUES (2, Guitar, Microphones, NULL, 4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms VALUES (3, 88-key MIDI Keyboard, Microphones, Drum, 6)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms VALUES (4, Drum, Guitar, Cassette deck, 4)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S2, MP1, 2015/Mar/21 09:00:00, NULL, 02:00:00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (S1, MP4, 2015/Mar/12 15:00:00, 2015/Mar/12 17:00:00, 02:00:00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (F4, MP3, 2015/Mar/22 11:00:00, 2015/Mar/22 13:30:00, 01:30:00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History VALUES (F2, MP1, 2015/Feb/20 09:00:00, 2015/Feb/20 10:30:00, 01:30:00)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Digital_Media_Assistants VALUES (A1, Todd Alquist, Video Editing, Audio Editing, Hunt)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Digital_Media_Assistants VALUES (A2, Hank Schrader, Video Editing, 3D Printing,Hill)"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //Journals
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication ("+
-    //             "Journal Of Web Semantic,"+
-    //             "J1,"+
-    //             "true,"+
-    //             "Roberto Navigli,"+
-    //             "2010,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Journals ("+
-    //             "J1,"+
-    //             "1,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication ("+
-    //             "International Journal on Semantic Web and Information,"+
-    //             "J2,"+
-    //             "true,"+
-    //             "Tim Berners Lee,"+
-    //             "2011,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Journals ("+
-    //             "J2,"+
-    //             "1,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication ("+
-    //             "Optimization Techniques for Large Scale Graph Analytics on Map Reduce,"+
-    //             "C1,"+
-    //             "true,"+
-    //             "HyeongSik Kim,"+
-    //             "2013,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Conf_Proceedings ("+
-    //             "C1,"+
-    //             "WWW,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-
-    //   try{
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Publication ("+
-    //             "An agglomerative query model for discovery in linked data: semantics and approach,"+
-    //             "C2,"+
-    //             "true,"+
-    //             "Sidan Gao,"+
-    //             "2014,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Conf_Proceedings ("+
-    //             "C2,"+
-    //             "SIGMOD,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Conference_Rooms ("+
-  	 //           "1,"+
-    //             "Hunt,"+
-	   //         "3,"+
-	   //         "2"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms ("+
-  	 //           "2,"+
-    //             "Hunt,"+
-	   //         "3,"+
-	   //         "3"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms ("+
-  	 //           "3,"+
-    //             "Hunt,"+
-	   //         "2,"+
-	   //         "4"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Conference_Rooms ("+
-  	 //           "4,"+
-    //             "Hunt,"+
-	   //         "3,"+
-	   //         "3"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms ("+
-  	 //           "5,"+
-    //             "Hunt,"+
-	   //         "3,"+
-	   //         "4"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms ("+
-  	 //           "6,"+
-    //             "Hunt,"+
-	   //         "3,"+
-	   //         "4"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Study_Rooms ("+
-  	 //           "7,"+
-    //             "Hunt,"+
-	   //         "2,"+
-	   //         "2"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //Cameras
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Cameras ("+
-  	 //           "CA1,"+
-    //             "Hunt,"+
-	   //         "Olympus,"+
-	   //         "E-620"+
-	   //         "14-42mm lens 1:3.5-5.6,"+
-	   //         "16G"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Cameras ("+
-  	 //           "CA2,"+
-    //             "Hunt,"+
-	   //         "Cannon,"+
-	   //         "EOS Rebel T4i"+
-	   //         "18-135mm EF-S IS STM Lens,"+
-	   //         "32G"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Cameras ("+
-  	 //           "CA3,"+
-    //             "Hunt,"+
-	   //         "Cannon,"+
-	   //         "EOS Rebel T4i"+
-	   //         "18-135mm EF-S IS STM Lens,"+
-	   //         "32G"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "S1,"+
-    //             "B2,"+
-    //             "2015-11-08 00:00:00,"+
-    //             "2015-11-13 00:00:00,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "S4,"+
-    //             "B4,"+
-    //             "2015-11-07 00:00:00,"+
-    //             "2015-11-11 00:00:00,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) {   e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Pub_Check_Out ("+
-    //             "S2,"+
-    //             "B4,"+
-    //             "2015-07-01 00:00:00,"+
-    //             "2015-08-08 00:00:00,"+
-    //             "488.00"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Student_Hold_List ("+
-    //             "S2"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "S2,"+
-    //             "B4,"+
-    //             "2015-07-01 00:00:00,"+
-    //             "NULL,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Pub_Check_Out ("+
-    //             "S3,"+
-    //             "B2,"+
-    //             "2015-10-01 00:00:00,"+
-    //             "2015-10-10 00:00:00,"+
-    //             "362.00"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Student_Hold_List ("+
-    //             "S3"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "S3,"+
-    //             "B2,"+
-    //             "2015-10-01 00:00:00,"+
-    //             "NULL,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     //Room Reservations
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "F1,"+
-    //             "R3,"+
-    //             "2015-11-01 09:00:00,"+
-    //             "2015-11-01 11:30:00,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "S1,"+
-    //             "R5,"+
-    //             "2015-11-12 15:00:00,"+
-    //             "2015-11-12 17:30:00,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "F4,"+
-    //             "R6,"+
-    //             "2015-11-02 11:00:00,"+
-    //             "2015-11-02 13:30:00,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "F2,"+
-    //             "R1,"+
-    //             "2015-10-20 9:00:00,"+
-    //             "2015-10-20 10:30:00,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "S1,"+
-    //             "CA1,"+
-    //             "2015-10-30 00:00:00,"+
-    //             "NULL,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Camera_Check_Out ("+
-    //             "S1,"+
-    //             "CA1,"+
-    //             "2015-10-30 00:00:00,"+
-    //             "2015-11-05 00:00:00,"+
-    //             "3960.00,"+
-    //             "NULL,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO  Resource_Request_History ("+
-    //             "S2,"+
-    //             "CA3,"+
-    //             "2015-10-16 00:00:00,"+
-    //             "NULL,"+
-    //             "NULL,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Camera_Check_Out ("+
-    //             "S2,"+
-    //             "CA3,"+
-    //             "2015-10-16 00:00:00,"+
-    //             "2015-10-22 00:00:00,"+
-    //             "4080.00,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     //FEES---------------------------------------------
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Fees ("+
-    //             "S2,"+
-    //             "Camera,"+
-    //             "4080,"+
-    //             "F1"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Fees ("+
-    //             "S1,"+
-    //             "Camera,"+
-    //             "3960,"+
-    //             "F2"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Fees ("+
-    //             "S3,"+
-    //             "Book,"+
-    //             "362.00,"+
-    //             "F3"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Fees ("+
-    //             "S2,"+
-    //             "Book,"+
-    //             "488,"+
-    //             "F4"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     //Media Rooms
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms ("+
-    //             "1,"+
-    //             "Mini Keyboard,"+
-    //             "Microphones,"+
-    //             "Cassete Deck,"+
-    //             "2,"+
-    //             "MP1,"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms ("+
-    //             "2,"+
-    //             "Guitar,"+
-    //             "Microphones,"+
-    //             "NULL,"+
-    //             "4,"+
-    //             "MP2"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms ("+
-    //             "3,"+
-    //             "88-Key MIDI Keyboard,"+
-    //             "Microphones,"+
-    //             "Drum,"+
-    //             "6,"+
-    //             "MP3"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Media_Rooms ("+
-    //             "4,"+
-    //             "Drum,"+
-    //             "Guitar,"+
-    //             "Cassete Deck,"+
-    //             "4,"+
-    //             "MP4"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "S2,"+
-    //             "MP1,"+
-    //             "2015-03-21 09:00:00,"+
-    //             "NULL,"+
-    //             "02:00:00,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "S1,"+
-    //             "MP4,"+
-    //             "2015-03-12 17:00:00,"+
-    //             "NULL,"+
-    //             "02:00:00,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "F4,"+
-    //             "MP3,"+
-    //             "2015-03-22 11:00:00,"+
-    //             "2015-03-22 13:00:00,"+
-    //             "01:30:00,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "F2,"+
-    //             "MP1,"+
-    //             "2015-02-20 09:00:00,"+
-    //             "2015-02-20 10:30:00,"+
-    //             "01:30:00,"+
-    //             "NULL"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Digital_Media_Assistants ("+
-    //             "A1,"+
-    //             "Todd Alquist,"+
-    //             "Video Editing,"+
-    //             "Audio Editing,"+
-    //             "NULL,"+
-    //             "Hunt"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Digital_Media_Assistants ("+
-    //             "A2,"+
-    //             "Hank Schrader,"+
-    //             "Video Editing,"+
-    //             "3D Printing,"+
-    //             "Audio Editing,"+
-    //             "Hill"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Digital_Media_Assistants ("+
-    //             "A3,"+
-    //             "Mary Schrader,"+
-    //             "3D Printing,"+
-    //             "Audio Editing,"+
-    //             "NULL,"+
-    //             "Hill"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-        
-    //     try {
-            
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Tech_Consult_Log ("+
-    //             "TCL1,"+
-    //             "S1,"+
-    //             "false,"+
-    //             "Hunt,"+
-    //             "NULL,"+
-    //             "2016-01-20 17:00:00,"+
-    //             "2016-01-20 18:00:00,"+
-    //             "A3,"+
-    //             "3D Printing"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
-    //     try {
-    //         Statement s = con.createStatement();
-    //         s.executeUpdate(
-    //             "INSERT INTO Resource_Request_History ("+
-    //             "S1,"+
-    //             "NULL,"+
-    //             "2016-01-20 17:00:00,"+
-    //             "2016-01-20 18:00:00,"+
-    //             "01:00:00,"+
-    //             "A3"+
-    //             ")"
-    //         );
-    //     } catch (SQLException e) { e.printStackTrace(); }
         
         Statement stmnt;
         String[] inserts = 
         {
-            "INSERT INTO Patrons VALUES ('Jesse', 'Pinkman', 'S1', 'Chemistry', 'American', 'false', 'jpink', 'jpink')",
-            "INSERT INTO Students VALUES  ('S1', '123456789', '123456787', '1511 Graduate Lane', 'Raleigh', '27606,NC', '1988/Mar/10', 'Male', 'Undergraduate', 'BS', 'First Year')",
-            "INSERT INTO Patrons VALUES ('Walt Jr.', 'NULL', 'S2', 'Chemistry', 'American', 'true', 'wjr', 'wjr')",
-            "INSERT INTO Students VALUES ('S2', '123456780', '123456781', '1512 Graduate Lane', 'Raleigh', 'NC', '27606', '1988/Mar/11', 'Male', 'Undergraduate', 'BS', 'Second Year')",
-            "INSERT INTO Patrons VALUES ('Gale', 'Boetticher', 'S3', 'Chemistry', 'Chile', 'true', 'gboet', 'gboet')",
-            "INSERT INTO Students VALUES ('S3', '123456782', '123456783', '1513 Graduate Lane', 'Raleigh', 'NC', '27606', '1988/Mar/12', 'Male', 'Undergraduate', 'BS', 'Third Year')",
-            "INSERT INTO Patrons VALUES ('Saul', 'Goodman', 'S4', 'Chemistry', 'American', 'false', 'sgood', 'sgood')",
-            "INSERT INTO Students VALUES ('S4', '123456784', '123456785', '1514 Graduate Lane', 'Raleigh', 'NC', '27606', '1988/Mar/01', 'Male', 'Graduate', 'MS', 'Second Year')",
-            "INSERT INTO Patrons VALUES ('Walter', 'White', 'F1', 'Chemistry', 'American', 'false', 'wwhite', 'wwhite')",
-            "INSERT INTO Faculty VALUES ('F1', 'Professor')",
-            "INSERT INTO Courses_Faculty ('CH101', 'F1')",
-            "INSERT INTO Patrons VALUES ('Gustavo', 'Fring', 'F2', 'Chemistry', 'American', 'false', 'gfring', 'gfring')",
-            "INSERT INTO Faculty VALUES ('F2', 'Assistant Professor')",
-            "INSERT INTO Patrons VALUES ('Hank', 'Schrader', 'F3', 'Chemistry', 'American', 'false', 'hschrad', 'hschrad')",
-            "INSERT INTO Faculty VALUES ('F3', 'Associate Professor')",
-            "INSERT INTO Courses_Faculty ('CH103', 'F3')",
-            "INSERT INTO Patrons VALUES ('Skyler', 'White', 'F4', 'Chemistry', 'American', 'false', 'swhite', 'swhite')",
-            "INSERT INTO Faculty VALUES ('F4', 'Professor')",
-            "INSERT INTO Courses_Faculty ('CH104', 'F4')",
-            "INSERT INTO Courses VALUES ('CH101', 'B1')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S1')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S2')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S3')",
-            "INSERT INTO Courses VALUES ('CH102', 'B2')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S2')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S3')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S4')",
-            "INSERT INTO Courses VALUES ('CH103', 'B3')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S3')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S4')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S1')",
-            "INSERT INTO Courses VALUES ('CH104', 'B4')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S1')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S2')",
-            "INSERT INTO Courses_Students VALUES ('CH101', 'S4')",
-            "INSERT INTO Publication VALUES ('Introduction to Chemistry', 'B1', 'true', 'SK Goyal', '2005')",
             "INSERT INTO Books VALUES ('1', 'B1', 'Pub1')",
+            "INSERT INTO Books VALUES ('2', 'B2', 'Pub2')",
+            "INSERT INTO Books VALUES ('3', 'B3', 'Pub3')",
+            "INSERT INTO Books VALUES ('4', 'B4', 'Pub4')",
+            "INSERT INTO Courses VALUES ('CH101', 'B1')",
+            "INSERT INTO Courses VALUES ('CH102', 'B2')",
+            "INSERT INTO Courses VALUES ('CH103', 'B3')",
+            "INSERT INTO Courses VALUES ('CH104', 'B4')",
+            "INSERT INTO Journal VALUES ('1', 'J1')",
+            "INSERT INTO Journal VALUES ('1', 'J2')",
+            "INSERT INTO Patrons VALUES ('Jesse', 'Pinkman', 'S1', 'Chemistry', 'American', '0', 'jpink', 'jpink')",
+            "INSERT INTO Students VALUES  ('S1', '123456789', '123456787', '1511 Graduate Lane', 'Raleigh', 'NC', '27606', DATE '1988-03-10', 'Male', 'Undergraduate', 'BS', 'First Year')",
+            "INSERT INTO Patrons VALUES ('Walt Jr.', NULL, 'S2', 'Chemistry', 'American', '1', 'wjr', 'wjr')",
+            "INSERT INTO Students VALUES ('S2', '123456780', '123456781', '1512 Graduate Lane', 'Raleigh', 'NC', '27606', DATE '1988-03-11', 'Male', 'Undergraduate', 'BS', 'Second Year')",
+            "INSERT INTO Patrons VALUES ('Gale', 'Boetticher', 'S3', 'Chemistry', 'Chile', '1', 'gboet', 'gboet')",
+            "INSERT INTO Students VALUES ('S3', '123456782', '123456783', '1513 Graduate Lane', 'Raleigh', 'NC', '27606', DATE '1988-03-12', 'Male', 'Undergraduate', 'BS', 'Third Year')",
+            "INSERT INTO Patrons VALUES ('Saul', 'Goodman', 'S4', 'Chemistry', 'American', '0', 'sgood', 'sgood')",
+            "INSERT INTO Students VALUES ('S4', '123456784', '123456785', '1514 Graduate Lane', 'Raleigh', 'NC', '27606', DATE '1988-03-01', 'Male', 'Graduate', 'MS', 'Second Year')",
+            "INSERT INTO Patrons VALUES ('Walter', 'White', 'F1', 'Chemistry', 'American', '0', 'wwhite', 'wwhite')",
+            "INSERT INTO Faculty VALUES ('F1', 'Professor')",
+            "INSERT INTO Courses_Faculty VALUES ('CH101', 'F1')",
+            "INSERT INTO Patrons VALUES ('Gustavo', 'Fring', 'F2', 'Chemistry', 'American', '0', 'gfring', 'gfring')",
+            "INSERT INTO Faculty VALUES ('F2', 'Assistant Professor')",
+            "INSERT INTO Patrons VALUES ('Hank', 'Schrader', 'F3', 'Chemistry', 'American', '0', 'hschrad', 'hschrad')",
+            "INSERT INTO Faculty VALUES ('F3', 'Associate Professor')",
+            "INSERT INTO Courses_Faculty VALUES ('CH103', 'F3')",
+            "INSERT INTO Patrons VALUES ('Skyler', 'White', 'F4', 'Chemistry', 'American', '0', 'swhite', 'swhite')",
+            "INSERT INTO Faculty VALUES ('F4', 'Professor')",
+            "INSERT INTO Courses_Faculty VALUES ('CH104', 'F4')",
+            "INSERT INTO Courses_Students VALUES ('CH101', 'S1')",
+            "INSERT INTO Courses_Students VALUES ('CH101', 'S2')",
+            "INSERT INTO Courses_Students VALUES ('CH101', 'S3')",
+            "INSERT INTO Courses_Students VALUES ('CH102', 'S2')",
+            "INSERT INTO Courses_Students VALUES ('CH102', 'S3')",
+            "INSERT INTO Courses_Students VALUES ('CH102', 'S4')",
+            "INSERT INTO Courses_Students VALUES ('CH103', 'S3')",
+            "INSERT INTO Courses_Students VALUES ('CH103', 'S4')",
+            "INSERT INTO Courses_Students VALUES ('CH103', 'S1')",
+            "INSERT INTO Courses_Students VALUES ('CH104', 'S1')",
+            "INSERT INTO Courses_Students VALUES ('CH104', 'S2')",
+            "INSERT INTO Courses_Students VALUES ('CH104', 'S4')",
+            "INSERT INTO Publication VALUES ('Introduction to Chemistry', 'B1', '1', 'SK Goyal', '2005')",
             "INSERT INTO Hardcopy VALUES ('1', 'B1')",
             "INSERT INTO Hardcopy VALUES ('2', 'B1')",
-            "INSERT INTO Reserved VALUES ('B1', 'CH101', '2016/Aug/08')",
-            "INSERT INTO Publication VALUES ('Introduction to Organic Chemistry', 'B2', 'true', 'HC Verma', '2006')",
-            "INSERT INTO Books VALUES ('2', 'B2', 'Pub2')",
+            "INSERT INTO Reserved VALUES ('B1', 'CH101', DATE '2016-08-08')",
+            "INSERT INTO Publication VALUES ('Introduction to Organic Chemistry', 'B2', '1', 'HC Verma', '2006')",
             "INSERT INTO Hardcopy VALUES ('1', 'B2')",
             "INSERT INTO Hardcopy VALUES ('2', 'B2')",
-            "INSERT INTO Publication VALUES ('Introduction to Physical Chemistry', 'B3', 'false', 'Resnick Halliday Walker', '2000')",
-            "INSERT INTO Books VALUES ('3', 'B3', 'Pub3')",
+            "INSERT INTO Publication VALUES ('Introduction to Physical Chemistry', 'B3', '0', 'Resnick Halliday Walker', '2000')",
             "INSERT INTO Hardcopy VALUES ('1', 'B3')",
             "INSERT INTO Hardcopy VALUES ('2', 'B3')",
-            "INSERT INTO Reserved VALUES ('B3', 'CH103', '2016/Aug/08')",
-            "INSERT INTO Publication VALUES ('Introduction to Inorganic Chemistry', 'B4', 'false', 'RC Mukherjee', '2005')",
-            "INSERT INTO Books VALUES ('4', 'B4', 'Pub4')",
+            "INSERT INTO Reserved VALUES ('B3', 'CH103',DATE '2016-08-08')",
+            "INSERT INTO Publication VALUES ('Introduction to Inorganic Chemistry', 'B4', '0', 'RC Mukherjee', '2005')",
             "INSERT INTO Hardcopy VALUES ('1', 'B4')",
             "INSERT INTO Hardcopy VALUES ('2', 'B4')",
-            "INSERT INTO Publication VALUES ('Journal of Web Semantic', 'J1', 'true', 'Roberto Navigli', '2010')",
-            "INSERT INTO Journal VALUES ('1', 'J1')",
-            "INSERT INTO Publication VALUES ('International Journal on Semantic Web and Information', 'J2', 'true', 'Tim Berners Lee', '2011')",
-            "INSERT INTO Journal VALUES ('1', 'J2')",
-            "INSERT INTO Publication VALUES ('Optimization Techniques for Large Scale Graph Analytics on Map Reduce', 'C1', 'true', 'HyeongSik Kim', '2013')",
+            "INSERT INTO Publication VALUES ('Journal of Web Semantic', 'J1', '1', 'Roberto Navigli', '2010')",
+            "INSERT INTO Publication VALUES ('International Journal on Semantic Web and Information', 'J2', '1', 'Tim Berners Lee', '2011')",
+            "INSERT INTO Publication VALUES ('Optimization Techniques for Large Scale Graph Analytics on Map Reduce', 'C1', '1', 'HyeongSik Kim', '2013')",
+            "INSERT INTO Publication VALUES ('An agglomerative query model for discovery in linked data: semantics and approach', 'C2', '1', 'Sidan Gao', '2014')",
             "INSERT INTO Conf_Proceedings VALUES ('C1', 'WWW')",
-            "INSERT INTO Publication VALUES ('An agglomerative query model for discovery in linked data: semantics and approach', 'C2', 'true', 'Sidan Gao', '2014')",
             "INSERT INTO Conf_Proceedings VALUES ('C2', 'SIGMOD')",
             "INSERT INTO Conference_Rooms VALUES ('1', 'Hunt', '3', '2')",
             "INSERT INTO Study_Rooms VALUES ('2', 'Hunt', '3', '3')",
@@ -1596,37 +590,38 @@ class DBBuilder {
             "INSERT INTO Study_Rooms VALUES ('6', 'Hill', '3', '4')",
             "INSERT INTO Study_Rooms VALUES ('7', 'Hunt', '2', '2')",
             "INSERT INTO Cameras VALUES ('CA1', 'Hunt', 'Olympus', 'E-620', '14-42mm lens 1:3.5-5.6', '16G')",
-            "INSERT INTO Cameras VALUES ('CA2', 'Hunt', 'Cannon', 'EOS Rebel T4i', '18-135mm EF-S IS STM Lens', '32G')INSERT INTO Cameras VALUES ('CA3', 'Hunt', 'Cannon', 'EOS Rebel T4i', '18-135mm EF-S IS STM Lens', '32G')",
-            "INSERT INTO Resource_Request_History VALUES ('S1', 'B2', '2015/Nov/08 00:00:00', '2015/Nov/13 00:00:00')",
-            "INSERT INTO Resource_Request_History VALUES ('S4', 'B4', '2015/Nov/07 00:00:00', '2015/Nov/11 00:00:00')",
-            "INSERT INTO Pub_Check_Out VALUES ('S2', 'B4', '1', '2015/Jul/01', '2015/Aug/08', '488.00')",
+            "INSERT INTO Cameras VALUES ('CA2', 'Hunt', 'Cannon', 'EOS Rebel T4i', '18-135mm EF-S IS STM Lens', '32G')",
+            "INSERT INTO Cameras VALUES ('CA3', 'Hunt', 'Cannon', 'EOS Rebel T4i', '18-135mm EF-S IS STM Lens', '32G')",
+            "INSERT INTO Resource_Request_History VALUES ('S1', 'B2',TIMESTAMP '2015-11-08 00:00:00',TIMESTAMP '2015-11-13 00:00:00', NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('S4', 'B4',TIMESTAMP '2015-11-07 00:00:00',TIMESTAMP '2015-11-11 00:00:00', NULL, NULL)",
+            "INSERT INTO Pub_Check_Out VALUES ('S2', 'B4', '1', DATE '2015-07-01', DATE '2015-08-08', '488.00')",
             "INSERT INTO Student_Hold_List VALUES ('S2')",
-            "INSERT INTO Resource_Request_History VALUES ('S2', 'B4', '2015/Jul/01 00:00:00', 'NULL', 'NULL', 'NULL')",
-            "INSERT INTO Pub_Check_Out VALUES ('S3', 'B2', '1', '2015/Oct/01 00:00:00', '2015/Oct/10 00:00:00', '362.00')",
+            "INSERT INTO Resource_Request_History VALUES ('S2', 'B4',TIMESTAMP '2015-07-01 00:00:00', NULL, NULL, NULL)",
+            "INSERT INTO Pub_Check_Out VALUES ('S3', 'B2', '1', TIMESTAMP '2015-10-01 00:00:00', TIMESTAMP '2015-10-10 00:00:00', '362.00')",
             "INSERT INTO Student_Hold_List VALUES ('S3')",
-            "INSERT INTO Resource_Request_History VALUES ('S3', 'B2', '2015/Oct/01 00:00:00', 'NULL', 'NULL', 'NULL')",
-            "INSERT INTO Resource_Request_History VALUES ('F1', 'R3', '2015/Nov/01 09:00:00', '2015/Nov/01 11:30:00', 'NULL', 'NULL')",
-            "INSERT INTO Resource_Request_History VALUES ('S1', 'R5', '2015/Oct/12 15:00:00', '2015/Oct/12 17:00:00', 'NULL', 'NULL')",
-            "INSERT INTO Resource_Request_History VALUES ('F4', 'R6', '2015/Nov/02 11:00:00', '2015/Nov/02 13:30:00', 'NULL', 'NULL')",
-            "INSERT INTO Resource_Request_History VALUES ('F2', 'R1', '2015/Oct/20 09:00:00', '2015/Oct/20 10:30:00', 'NULL', 'NULL')",
-            "INSERT INTO Resource_Request_History VALUES ('S3', 'CA2', '2015/Nov/13 00:00:00', '2015/Nov/19 00:00:00', 'NULL', 'NULL')",
-            "INSERT INTO Resource_Request_History VALUES ('S1', 'CA1', '2015/Oct/13 00:00:00', 'NULL', 'NULL', 'NULL')",
-            "INSERT INTO Camera_Check_Out VALUES ('S1', 'CA1', '2015/Nov/13', '2015/Nov/05', '3960.00')",
-            "INSERT INTO Resource_Request_History VALUES ('S2', 'CA3', '2015/Oct/16 00:00:00', 'NULL', 'NULL', 'NULL')",
-            "INSERT INTO Camera_Check_Out VALUES ('S2', 'CA3', '2015/Oct/16', '2015/Oct/22', '4080.00')",
+            "INSERT INTO Resource_Request_History VALUES ('S3', 'B2', TIMESTAMP '2015-10-01 00:00:00', NULL, NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('F1', 'R3', TIMESTAMP '2015-11-01 09:00:00', TIMESTAMP '2015-11-01 11:30:00', NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('S1', 'R5', TIMESTAMP '2015-10-12 15:00:00', TIMESTAMP '2015-10-12 17:00:00', NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('F4', 'R6', TIMESTAMP '2015-11-02 11:00:00', TIMESTAMP '2015-11-02 13:30:00', NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('F2', 'R1', TIMESTAMP '2015-10-20 09:00:00', TIMESTAMP '2015-10-20 10:30:00', NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('S3', 'CA2', TIMESTAMP '2015-11-13 00:00:00', TIMESTAMP '2015-11-19 00:00:00', NULL, NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('S1', 'CA1', TIMESTAMP '2015-10-13 00:00:00', NULL, NULL, NULL)",
+            "INSERT INTO Camera_Check_Out VALUES ('S1', 'CA1', DATE '2015-11-13', DATE '2015-11-05', '3960.00')",
+            "INSERT INTO Resource_Request_History VALUES ('S2', 'CA3', TIMESTAMP '2015-10-16 00:00:00', NULL, NULL, NULL)",
+            "INSERT INTO Camera_Check_Out VALUES ('S2', 'CA3', DATE '2015-10-16', DATE '2015-10-22', '4080.00')",
             "INSERT INTO Media_Rooms VALUES ('1', 'Mini Keyboard', 'Microphones', 'Cassette deck', '2')",
-            "INSERT INTO Media_Rooms VALUES ('2', 'Guitar', 'Microphones', 'NULL', '4')",
+            "INSERT INTO Media_Rooms VALUES ('2', 'Guitar', 'Microphones', NULL, '4')",
             "INSERT INTO Media_Rooms VALUES ('3', '88-key MIDI Keyboard', 'Microphones', 'Drum', '6')",
             "INSERT INTO Media_Rooms VALUES ('4', 'Drum', 'Guitar', 'Cassette deck', '4')",
-            "INSERT INTO Resource_Request_History VALUES ('S2', 'MP1', '2015/Mar/21 09:00:00', 'NULL', '02:00:00')",
-            "INSERT INTO Resource_Request_History VALUES ('S1', 'MP4', '2015/Mar/12 15:00:00', '2015/Mar/12 17:00:00', '02:00:00')",
-            "INSERT INTO Resource_Request_History VALUES ('F4', 'MP3', '2015/Mar/22 11:00:00', '2015/Mar/22 13:30:00', '01:30:00')",
-            "INSERT INTO Resource_Request_History VALUES ('F2', 'MP1', '2015/Feb/20 09:00:00', '2015/Feb/20 10:30:00', '01:30:00')",
+            "INSERT INTO Resource_Request_History VALUES ('S2', 'MP1', TIMESTAMP '2015-03-21 09:00:00', TIMESTAMP '2015-03-21 11:00:00', '02:00:00', NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('S1', 'MP4', TIMESTAMP '2015-03-12 15:00:00', TIMESTAMP '2015-03-12 17:00:00', '02:00:00', NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('F4', 'MP3', TIMESTAMP '2015-03-22 11:00:00', TIMESTAMP '2015-03-22 13:30:00', '01:30:00', NULL)",
+            "INSERT INTO Resource_Request_History VALUES ('F2', 'MP1', TIMESTAMP '2015-02-20 09:00:00', TIMESTAMP '2015-02-20 10:30:00', '01:30:00', NULL)",
             "INSERT INTO Digital_Media_Assistants VALUES ('A1', 'Todd Alquist', 'Video Editing', 'Audio Editing', 'Hunt')",
-            "INSERT INTO Digital_Media_Assistants VALUES ('A2', 'Hank Schrader', 'Video Editing', '3D Printing,Hill')",
-            "INSERT INTO Digital_Media_Assistants VALUES ('A3', 'Mary Schrader', '3D Printing', 'Audio Editing,Hill')",
-            "INSERT INTO Tech_Consult VALUES ('S1', 'false', 'Hunt', 'NULL', '2016/Jan/20 17:00:00', '2016/Jan/20 18:00:00', 'A3', '3D Printing', '', '', ',')",
-            "INSERT INTO Resource_Request_History VALUES ('S1', 'NULL', '2016/Jan/20 17:00:00', '2016/Jan/20 18:00:00', 'NULL', '0')"
+            "INSERT INTO Digital_Media_Assistants VALUES ('A2', 'Hank Schrader', 'Video Editing', '3D Printing', 'Hill')",
+            "INSERT INTO Digital_Media_Assistants VALUES ('A3', 'Mary Schrader', '3D Printing', 'Audio Editing', 'Hill')",
+            "INSERT INTO Tech_Consultation_Log VALUES ('0', 'S1', '0', 'Hunt', NULL, TIMESTAMP '2016-01-20 17:00:00', TIMESTAMP '2016-01-20 18:00:00', '0', '3D Printing', 'A3')",
+            "INSERT INTO Resource_Request_History VALUES ('S1', 'null', TIMESTAMP '2016-01-20 17:00:00', TIMESTAMP '2016-01-20 18:00:00', '01:00:00', '0')"
         };
         for (int i = 0; i < inserts.length; i++) {
             try {

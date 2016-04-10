@@ -195,4 +195,12 @@ class DBInteraction {
     public String requestCameraReservation(String userid, String cameraid, String date){
         return "";
     }
+    
+    // updaet the late fees
+    // books $2 per day
+    // cameras $1 per day
+    // run this when the program starts
+    public void recalculateLateFees() {
+        
+    }
 }

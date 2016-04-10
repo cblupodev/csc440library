@@ -473,8 +473,10 @@ class EnterHere {
     	
     	db = new DBInteraction(con);
     	
+    	db.recalculateLateFees();
+    	
     	// start user interface interaction
-    	displayLogin();
+    	// displayLogin();
     }
     
     // Have to make this dumb thing because System.out.println takes too long to type
