@@ -3,9 +3,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
+import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 import java.util.*;
 
 class EnterHere {
+	
+	public static final long DAY_IN_MS = 86400000;
+	public static final long HOUR_IN_MS = DAY_IN_MS / 24;
 	
 	private Connection con = null;
 	private DBInteraction db = null;
@@ -18,6 +23,30 @@ class EnterHere {
         enter.run();
     }
     
+    private static Timestamp strToTs(String str){
+    	// conversion function taken from: http://stackoverflow.com/questions/18915075/java-convert-string-to-timestamp
+    	try{
+		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss", Locale.US);
+		    Date parsedDate = dateFormat.parse(str);
+		    Timestamp ts = new java.sql.Timestamp(parsedDate.getTime());
+		    return ts;
+		}catch(Exception e){e.printStackTrace();}
+		return null;
+    }
+    
+    private static Timestamp addDays(Timestamp ts, int days){
+    	long ms = ts.getTime();
+    	ms += Long.valueOf(days) * DAY_IN_MS;
+    	ts.setTime(ms);
+    	return ts;
+    }
+    
+    private static Timestamp addHours(Timestamp ts, int hours){
+    	long ms = ts.getTime();
+    	ms += Long.valueOf(hours) * HOUR_IN_MS;
+    	ts.setTime(ms);
+    	return ts;
+    }
     
     // connect to the database
     // username doesn't include orcl
@@ -53,18 +82,6 @@ class EnterHere {
 		}
 		
 		return con;
-    }
-    
-    // print all the table names
-    private void printTableNames() {
-    	try {
-	    	DatabaseMetaData md = con.getMetaData();
-			ResultSet rs1 = md.getTables(null, null, null, null);
-			while (rs1.next()) {
-	  			String tableName = rs1.getString("TABLE_NAME");
-	  			System.out.println(tableName);
-			}
-    	} catch (SQLException e) { e.printStackTrace(); }
     }
     
     private void displayLogin() {
@@ -262,16 +279,21 @@ class EnterHere {
 					if (res == 1) {
 						// If the requested publication is available, details like checkout date/time, return date/time should be taken as input 
 						sop(
-							"enter checkout date, must be in this format YYYY-MON-DD HH24:MI"+
-							"example '2003/05/03 21:02:44'"
+							"enter checkout date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
+							"example '2003-05-03,21:02:44'"
 						);
-						String checkoutDate  = console.next();
+						String cod  = console.next();
+						Timestamp checkoutDate = strToTs(cod);
 						sop(
 							"enter return date"
 						);
 						String returnDate  = console.next();
 						// checkout the publication
-						db.checkoutPublication(currentID, idres, checkoutDate, returnDate);
+						Timestamp checkinDate = addDays(checkoutDate, 14);
+						if(!isStudent){
+							checkinDate = addDays(checkinDate, 14);
+						}
+						db.checkoutPublication(currentID, idres, checkoutDate, checkinDate, isStudent);
 						// go back to publication dispaly
 						displayResourcesPublications();
 					} else {
@@ -320,15 +342,16 @@ class EnterHere {
 		} else if (res == 2) {
 			sop("Enter room id");
 			// don't forget to convert this id into the appropriate int if need be, difference between conference and study/media rooms ids
-			int id = console.nextInt();
+			String id = console.next();
 			String avail = db.roomAvailability(id, isStudent);
 			if (isStudent && (avail != "" || avail != "Conference")) {
 				// student is allowed to book this room
-				sop("enter reservation duration"); // todo figure out what format this is
-				String duration = console.next();
-				sop("enter reservation date, must be in this format YYYY-MON-DD HH24:MI"+
-					"example '2003/05/03 21:02:44'");
-				String date = console.next();
+				sop("enter reservation duration in hours"); // todo figure out what format this is
+				int duration = console.nextInt();
+				sop("enter reservation date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
+					"example '2003-05-03,21:02:44'");
+				String d = console.next();
+				Timestamp date = strToTs(d);
 				if (avail == "Media") {
 					sop("enter instrument: 	(1) 'Mini Keyboard', (2) 'Microphones', (3) 'Cassette deck', (4) 'Guitar', (5) '88-key MIDI Keyboard', (6) 'Drum'");
 					int instrNum = console.nextInt();
@@ -336,10 +359,11 @@ class EnterHere {
 					String instrString = instrumentsList[instrNum - 1];
 					sop("enter number of chairs wanted 2 OR 4 OR 6");
 					int chairNum = console.nextInt();
-					db.reserveMediaRoom(currentID, id, instrString, chairNum);
+					db.reserveMediaRoom(currentID, id, instrString, chairNum, date); //todo: add date
 					displayResources();
 				} else {
-					db.reserveConferenceStudyRoom(currentID, id, date, duration); // this will reject if student tries to reserve conference
+					Timestamp endDate = addHours(date, duration);
+					db.reserveConferenceStudyRoom(currentID, id, library, date, endDate); // this will reject if student tries to reserve conference
 				}
 			} else {
 				sop("failed");
@@ -378,14 +402,14 @@ class EnterHere {
 				String topic;
 				sop("enter desired library (Hunt OR Hill)");
 				location = console.next();
-				sop("enter first desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
-					"example '2003/05/03 21:02:44'");
+				sop("enter first desired reservation date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
+					"example '2003-05-03,21:02:44'");
 				date1 = console.next();
-				sop("enter second desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
-					"example '2003/05/03 21:02:44'");
+				sop("enter second desired reservation date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
+					"example '2003-05-03,21:02:44'");
 				date2 = console.next();
-				sop("enter thrid desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
-					"example '2003/05/03 21:02:44'");
+				sop("enter third desired reservation date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
+					"example '2003-05-03,21:02:44'");
 				date3 = console.next();
 				sop("enter the topic you need help with");
 				topic = console.next();
@@ -438,9 +462,9 @@ class EnterHere {
     	if(res.equals("1")){
     		displayHomepage();
     	} else {
-    		String resource = db.printResourceDetails(currentID, res); // this is asking for a resource ID
-    		sop(resource);
-    		if (resource.equals("Invalid ID")) {
+    		String cam = db.printCameraDetails(res);
+    		sop(cam);
+    		if (cam.equals("Invalid ID")) {
     			displayHomepage();
     		} else {
 	    		sop("Would you like to reserve this camera?\n"+
@@ -448,10 +472,12 @@ class EnterHere {
 	    			"(1) Yes"
 	    		);
 	    		if(console.nextInt() == 1){
-	    			sop("enter desired reservation date, must be in this format YYYY-MON-DD HH24:MI"+
-						"example '2003/05/03 21:02:44'");
-					String date = console.next();
-					sop(db.requestCameraReservation(currentID, res, date));
+	    			sop("enter desired reservation date, must be in this format YYYY-MM-DD,HH24:MM:SS "+
+						"example '2003-05-03,21:02:44'");
+					String input = console.next();
+					Timestamp date = strToTs(input);
+					Timestamp dueDate = addDays(date, 6);
+					sop(db.requestCameraReservation(currentID, res, date, dueDate));
 					displayHomepage();
 	    		} else {
 	    			displayHomepage();
@@ -474,6 +500,7 @@ class EnterHere {
     	db = new DBInteraction(con);
     	
     	db.recalculateLateFees();
+
     	
     	// start user interface interaction
     	// displayLogin();
