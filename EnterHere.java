@@ -23,7 +23,7 @@ class EnterHere {
         enter.run();
     }
     
-    private static Timestamp strToTs(String str){
+    public static Timestamp strToTs(String str){
     	// conversion function taken from: http://stackoverflow.com/questions/18915075/java-convert-string-to-timestamp
     	try{
 		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss", Locale.US);
@@ -37,8 +37,8 @@ class EnterHere {
     private static Timestamp addDays(Timestamp ts, int days){
     	long ms = ts.getTime();
     	ms += Long.valueOf(days) * DAY_IN_MS;
-    	ts.setTime(ms);
-    	return ts;
+    	Timestamp newts = new Timestamp(ms);
+    	return newts;
     }
     
     private static Timestamp addHours(Timestamp ts, int hours){
@@ -101,6 +101,11 @@ class EnterHere {
     		if (log != "") {
     			// login succesfull
     			currentID = log;
+    			if(res == 1){
+    				isStudent = true;
+    			} else {
+    				isStudent = false;
+    			}
     			displayHomepage();	
     		} else {
     			sop("login failed");
@@ -172,7 +177,7 @@ class EnterHere {
     
     private void displayResources() {
     	sop(
-    		"(1) Go back"+
+    		"(1) Go back\n"+
     		"(2) Publications\n"+
     		"(3) Conference/Study/Media-production room\n"+
     		"(4) Technology Consultation\n"+
@@ -213,7 +218,11 @@ class EnterHere {
 	    			"(1) Yes"
 	    		);
 	    		if(console.nextInt() == 1){
-	    			db.renewCheckedOutResource(currentID, res);
+	    			sop("When would you like to reserve it until? must be in this format YYYY-MM-DD,HH24:MM:SS"+
+							"example '2003-05-03,21:02:44'");
+					String renewDate = console.next();
+					Timestamp newEndDate = strToTs(renewDate);
+	    			db.renewCheckedOutResource(currentID, res, newEndDate);
 	    			displayHomepage();
 	    		} else {
 	    			displayHomepage();
@@ -265,57 +274,53 @@ class EnterHere {
 			// select specific publication
 			sop("enter publication id");
 			String idres = console.next();
-			if (db.hasPublication(idres)) {
-				sop(db.printPublicationInfo(idres)); // print publication info
-				
-				// make the checkout/renew distinction on the database side
-				// I'de just be duplicating the same interaction on the ui side
-				
-				// determine if the publication is checked out by the user
-				// if (!db.isPublicationCheckedOutBy(currentID, idres)) {
-					// ask to request it
-					sop("do you want to request/renew this? 1 OR 0");
-					res = console.nextInt();
-					if (res == 1) {
-						// If the requested publication is available, details like checkout date/time, return date/time should be taken as input 
-						sop(
-							"enter checkout date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
-							"example '2003-05-03,21:02:44'"
-						);
-						String cod  = console.next();
-						Timestamp checkoutDate = strToTs(cod);
-						sop(
-							"enter return date"
-						);
-						String returnDate  = console.next();
-						// checkout the publication
-						Timestamp checkinDate = addDays(checkoutDate, 14);
-						if(!isStudent){
-							checkinDate = addDays(checkinDate, 14);
-						}
-						db.checkoutPublication(currentID, idres, checkoutDate, checkinDate, isStudent);
-						// go back to publication dispaly
-						displayResourcesPublications();
-					} else {
-						displayResources();
-					}
-				// }
-				// else {
-				// 	// todo maybe distingish renew or a new checkout on the datbase side
-				// 	sop("do you want to renew this? 1 OR 0");
-				// 	res = console.nextInt();
-				// 	if (res = 1) {
-				// 		db.checkoutPublication(currentID, idres);
-				// 	} else {
-				// 		displayResources();
-				// 	}
-				// }
-			} else {
-				sop("no publication");
-				displayResources();
-			}
-		} else {
+			sop(db.printPublicationInfo(idres)); // print publication info
 			
+			// make the checkout/renew distinction on the database side
+			// I'de just be duplicating the same interaction on the ui side
+			
+			// determine if the publication is checked out by the user
+			// if (!db.isPublicationCheckedOutBy(currentID, idres)) {
+				// ask to request it
+				sop("do you want to request/renew this? 1 OR 0");
+				res = console.nextInt();
+				if (res == 1) {
+					// If the requested publication is available, details like checkout date/time, return date/time should be taken as input 
+					sop(
+						"enter checkout date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
+						"example '2003-05-03,21:02:44'"
+					);
+					String cod  = console.next();
+					Timestamp checkoutDate = strToTs(cod);
+					// sop(
+					// 	"enter return date"
+					// );
+					// String returnDate  = console.next();
+					// checkout the publication
+					Timestamp checkinDate = addDays(checkoutDate, 14);
+					if(!isStudent){
+						checkinDate = addDays(checkinDate, 14);
+					}
+					db.checkoutPublication(currentID, idres, checkoutDate, checkinDate, isStudent);
+					// go back to publication dispaly
+					displayResourcesPublications();
+				} else {
+					displayResources();
+				}
+			// }
+			// else {
+			// 	// todo maybe distingish renew or a new checkout on the datbase side
+			// 	sop("do you want to renew this? 1 OR 0");
+			// 	res = console.nextInt();
+			// 	if (res = 1) {
+			// 		db.checkoutPublication(currentID, idres);
+			// 	} else {
+			// 		displayResources();
+			// 	}
+			// }
+		} else {
+			sop("no publication");
+			displayResources();
 		}
     }
 	
@@ -411,9 +416,18 @@ class EnterHere {
 				sop("enter third desired reservation date, must be in this format YYYY-MM-DD,HH24:MM:SS"+
 					"example '2003-05-03,21:02:44'");
 				date3 = console.next();
+				sop("enter the amnout of time you will need help (in hours)");
+				int duration = console.nextInt();
+				duration = 1; //because default
 				sop("enter the topic you need help with");
 				topic = console.next();
-				db.requestTechnologyConsultation(currentID, location, date1, date2, date3, topic);
+				Timestamp d1s = strToTs(date1);
+				Timestamp d1e = addHours(d1s, duration);
+				Timestamp d2s = strToTs(date2);
+				Timestamp d2e = addHours(d2s, duration);
+				Timestamp d3s = strToTs(date3);
+				Timestamp d3e = addHours(d3s, duration);
+				db.requestTechnologyConsultation(currentID, location, d1s, d1e, d2s, d2e, d3s, d3e, topic);
 				displayHomepage();
 				break;
 			}
@@ -503,7 +517,7 @@ class EnterHere {
 
     	
     	// start user interface interaction
-    	// displayLogin();
+    	displayLogin(); //I Believe
     }
     
     // Have to make this dumb thing because System.out.println takes too long to type

@@ -502,10 +502,12 @@ class DBBuilder {
         try{
             PreparedStatement ps = con.prepareStatement(
                 "CREATE TABLE Tech_Reservation ("+
-                "	timeSlot timestamp NOT NULL,"+
+                "	startTime timestamp NOT NULL,"+
+                "   endTime timestamp NOT NULL,"+
                 "	tcID varchar(16) NOT NULL,"+
                 "	patronID varchar(16) NOT NULL,"+
                 "	assistant_ID varchar(16) NOT NULL,"+
+                "   PRIMARY KEY (tcID),"+
                 "	FOREIGN KEY (tcID) REFERENCES TechConsult (tcID)"+
                 "		ON DELETE CASCADE,"+
                 "	FOREIGN KEY (patronID) REFERENCES Patrons (ID)"+

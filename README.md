@@ -1,12 +1,23 @@
-How to run the program `java -cp .:/afs/unity.ncsu.edu/users/c/cblupo/workspace/ojdbc6.jar EnterHere`
+TEAM
+Patrick Carlson
+Christopher Lupo
+Dylan Hahn
+Christian McCurdy
 
-I'm using this date format `YYYY-MON-DD HH24:MI` cause this https://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm
+
+It's a CLI program
+How to run it
+`java -cp <set class path for ojdbc6.jar> EnterHere`
+Example running in ncsu remote linux
+`$eos java -cp .:/afs/unity.ncsu.edu/users/c/cblupo/workspace/ojdbc6.jar EnterHere`
 
 repo link https://github.ncsu.edu/cblupo/csc440library
 
-Link to shared folder [[drive.google.com]](https://drive.google.com/open?id=0B1noHb_5Rc2CcGNvcDFMT0c4SG8)
-
-https://moodle1516-courses.wolfware.ncsu.edu/mod/forum/discuss.php?d=229176
-
 pscarlso@orcl
 001063754
+
+// for lupo ↓
+- http://www.skylit.com/javamethods/faqs/createjar.html
+- http://www.javatpoint.com/example-to-connect-to-the-oracle-database
+- http://stackoverflow.com/questions/9689793/cant-execute-jar-file-no-main-manifest-attribute
+- http://www.cyberciti.biz/faq/run-execute-sh-shell-script/
