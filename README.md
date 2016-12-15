@@ -1,3 +1,6 @@
+This project is a database application to simulate basic functions of a university library: checkout books, reserve rooms, reserve technology, etc.
+
+
 TEAM
 Patrick Carlson
 Christopher Lupo
